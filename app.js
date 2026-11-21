@@ -513,6 +513,7 @@ async function downloadTicketImage() {
 /* ---------------- tickets registry ---------------- */
 function renderTicketsScreen() {
   fillEventSelect($("ticketsEvent"));
+  loadOrders();
   loadTickets();
 }
 async function loadTickets() {
@@ -861,6 +862,8 @@ async function renderSettings() {
   $("profileLine").textContent = session.member.name + " • " + session.member.role;
   $("setBiz").value = session.tenant.business_name || "";
   $("setWhatsapp").value = session.tenant.owner_whatsapp || "";
+  $("setBank").value = session.tenant.bank_details || "";
+  $("shopLink").textContent = shopUrl();
   $("licenceLine").textContent = session.grace
     ? "Licence has ENDED — you are in read-only grace. Contact your provider to renew."
     : "Licence active" + (session.tenant.licence_expires ? " until " + session.tenant.licence_expires : "") + ". Renewals are handled by your provider.";
@@ -999,8 +1002,13 @@ function wire() {
     try { r = await authed("update_settings", { p_business_name: $("setBiz").value.trim(), p_owner_whatsapp: $("setWhatsapp").value.trim() }); }
     catch (err) { toast(err.message); return; }
     if (!r.ok) { toast(r.message || "Could not save."); return; }
+    try {
+      const rb = await authed("update_bank_details", { p_bank_details: $("setBank").value });
+      if (!rb.ok) { toast(rb.message || "Bank details could not be saved."); return; }
+    } catch (err) { toast(err.message); return; }
     session.tenant.business_name = $("setBiz").value.trim();
     session.tenant.owner_whatsapp = $("setWhatsapp").value.trim();
+    session.tenant.bank_details = $("setBank").value;
     saveSession();
     $("bizName").textContent = session.tenant.business_name || "Ticket Office";
     toast("Settings saved.");
@@ -1008,7 +1016,152 @@ function wire() {
 
   $("ticketClose").addEventListener("click", () => $("ticketModal").classList.add("hidden"));
   $("ticketBackIssue").addEventListener("click", () => { $("ticketModal").classList.add("hidden"); go("issue"); });
+  $("openShopBtn").addEventListener("click", openShop);
+  $("shopBack").addEventListener("click", () => { $("shopScreen").classList.add("hidden"); $("loginScreen").classList.remove("hidden"); bootLogin(); });
+  $("shopForm").addEventListener("submit", submitShopOrder);
+  $("shopType").addEventListener("change", updateShopTotal);
+  $("shopQty").addEventListener("input", updateShopTotal);
+  $("shopAgain").addEventListener("click", () => { $("shopDone").classList.add("hidden"); openShop(); });
+  $("shopCopyBank").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("shopBank").textContent); toast("Bank details copied."); }
+    catch (e) { toast("Copy failed — long-press the bank details to copy them."); }
+  });
+  $("shopLinkCopy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(shopUrl()); toast("Shop link copied."); }
+    catch (e) { toast("Copy failed — the link is shown above."); }
+  });
   $("ticketDownload").addEventListener("click", downloadTicketImage);
+}
+
+
+/* ---------------- buyer shop (public) ---------------- */
+let shopData = null;   // public_shop result
+let shopEvent = null;  // event the buyer picked
+
+function shopUrl() {
+  return location.origin + location.pathname + "?shop";
+}
+
+async function openShop() {
+  $("loginScreen").classList.add("hidden");
+  $("app").classList.add("hidden");
+  $("shopScreen").classList.remove("hidden");
+  $("shopEvents").innerHTML = "<p class=\"muted\">Loading events…</p>";
+  $("shopForm").classList.add("hidden");
+  $("shopDone").classList.add("hidden");
+  try {
+    shopData = await rpc("public_shop", { p_slug: CFG.TENANT_SLUG });
+  } catch (e) {
+    $("shopEvents").innerHTML = "<p class=\"error\">" + esc(e.message) + "</p>";
+    return;
+  }
+  if (!shopData.ok) {
+    $("shopEvents").innerHTML = "<p class=\"error\">" + esc(shopData.message || "Shop unavailable.") + "</p>";
+    return;
+  }
+  $("shopBiz").textContent = shopData.business_name + " — Tickets";
+  const evs = shopData.events || [];
+  $("shopEvents").innerHTML = evs.length ? evs.map((e) => `
+    <div class="event-card">
+      ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
+      <div class="event-meta">
+        <strong>${esc(e.name)}</strong><br>
+        ${esc(fmtDate(e.event_date))} • ${esc(e.start_time || "")} • ${esc(e.venue || "")}<br>
+        ${(e.types || []).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}
+      </div>
+      <button type="button" class="btn primary" data-shop-ev="${e.id}">Order tickets</button>
+    </div>`).join("")
+    : "<p class=\"muted\">No events are on sale right now.</p>";
+  $("shopEvents").querySelectorAll("[data-shop-ev]").forEach((b) =>
+    b.addEventListener("click", () => selectShopEvent(b.getAttribute("data-shop-ev"))));
+}
+
+function selectShopEvent(id) {
+  shopEvent = (shopData.events || []).find((e) => e.id === id);
+  if (!shopEvent) return;
+  $("shopFormTitle").textContent = "Order — " + shopEvent.name;
+  $("shopType").innerHTML = (shopEvent.types || []).map((t) =>
+    `<option value="${t.id}">${esc(t.name)} — ${money(t.price)}</option>`).join("");
+  $("shopForm").classList.remove("hidden");
+  $("shopDone").classList.add("hidden");
+  updateShopTotal();
+  $("shopForm").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function shopUnitPrice() {
+  const t = (shopEvent.types || []).find((x) => x.id === $("shopType").value);
+  return t ? Number(t.price) : 0;
+}
+function updateShopTotal() { $("shopTotal").textContent = money(shopUnitPrice() * Math.max(1, Number($("shopQty").value || 1))); }
+
+async function submitShopOrder(ev) {
+  ev.preventDefault();
+  showErr("shopError", "");
+  let r;
+  try {
+    r = await rpc("place_order", {
+      p_slug: CFG.TENANT_SLUG, p_event_id: shopEvent.id, p_type_id: $("shopType").value,
+      p_qty: Number($("shopQty").value || 1),
+      p_buyer_name: $("shopName").value.trim(), p_buyer_whatsapp: $("shopPhone").value.trim()
+    });
+  } catch (e) { showErr("shopError", e.message); return; }
+  if (!r.ok) { showErr("shopError", r.message || "Could not place the order."); return; }
+  $("shopForm").classList.add("hidden");
+  $("shopDone").classList.remove("hidden");
+  $("shopDoneText").textContent = "Thank you, " + $("shopName").value.trim() + ". Your order: " +
+    r.qty + " × " + r.type_name + " for " + r.event_name + " — total " + money(r.total) + ". " +
+    "Pay by bank transfer below, then send your order to the organiser on WhatsApp. " +
+    "Your tickets are confirmed once the organiser accepts the order.";
+  const bank = (r.bank_details || "").trim();
+  $("shopBankBox").classList.toggle("hidden", !bank);
+  if (bank) $("shopBank").textContent = bank;
+  const num = (r.owner_whatsapp || "").replace(/[^0-9]/g, "");
+  const wa = $("shopWa");
+  if (num) {
+    const msg = "Hello " + shopData.business_name + ", I just ordered " + r.qty + " x " + r.type_name +
+      " for " + r.event_name + " (total " + money(r.total) + "). My name is " + $("shopName").value.trim() +
+      ". I am paying by bank transfer.";
+    wa.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
+    wa.classList.remove("hidden");
+  } else wa.classList.add("hidden");
+  $("shopDone").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ---------------- buyer orders inbox (team) ---------------- */
+async function loadOrders() {
+  const box = $("ordersList");
+  let r;
+  try { r = await authed("list_orders", {}); } catch (e) { box.innerHTML = ""; return; }
+  if (!r.ok) { box.innerHTML = ""; return; }
+  const orders = r.orders || [];
+  if (!orders.length) { box.innerHTML = "<p class=\"muted\">No buyer orders yet. Orders from the ticket shop land here.</p>"; return; }
+  box.innerHTML = orders.map((o) => `
+    <div class="order-row">
+      <div class="row-between">
+        <span><strong>${esc(o.buyer_name)}</strong> — ${esc(o.event_name)}<br>
+          ${o.qty} × ${esc(o.type_name)} • ${money(o.total)} • ${esc(new Date(o.created_at).toLocaleString())}</span>
+        <span class="chip ${o.status === "new" ? "" : o.status === "issued" ? "used" : "void"}">${esc(o.status.toUpperCase())}</span>
+      </div>
+      ${o.buyer_whatsapp ? `<div><a href="https://wa.me/${esc(o.buyer_whatsapp.replace(/[^0-9]/g, ""))}" target="_blank" rel="noopener">Message buyer on WhatsApp</a></div>` : ""}
+      ${o.status === "new" ? `<div style="margin-top:8px">
+        <button type="button" class="btn primary small" data-convert="${o.id}">Issue tickets (unpaid)</button>
+        <button type="button" class="btn ghost small" data-decline="${o.id}">Decline</button></div>` : ""}
+    </div>`).join("");
+  box.querySelectorAll("[data-convert]").forEach((b) => b.addEventListener("click", async () => {
+    b.disabled = true;
+    let r2;
+    try { r2 = await authed("convert_order", { p_order_id: b.getAttribute("data-convert") }); }
+    catch (e) { toast(e.message); b.disabled = false; return; }
+    if (!r2.ok) { toast(r2.message || "Could not issue."); b.disabled = false; return; }
+    toast("Tickets issued: " + (r2.tickets || []).map((t) => t.code).join(", "));
+    loadOrders(); loadTickets();
+  }));
+  box.querySelectorAll("[data-decline]").forEach((b) => b.addEventListener("click", async () => {
+    let r2;
+    try { r2 = await authed("decline_order", { p_order_id: b.getAttribute("data-decline") }); }
+    catch (e) { toast(e.message); return; }
+    if (!r2.ok) { toast(r2.message || "Could not decline."); return; }
+    loadOrders();
+  }));
 }
 
 /* ---------------- boot ---------------- */
@@ -1025,6 +1178,8 @@ document.addEventListener("DOMContentLoaded", () => {
     $("graceBanner").classList.toggle("hidden", !session.grace);
     applyRoles();
     refreshEvents().then(() => go(role() === "door" ? "door" : "dashboard")).catch(() => forceSignOut());
+  } else if (new URLSearchParams(location.search).has("shop")) {
+    openShop();
   } else {
     bootLogin();
   }
