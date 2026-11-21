@@ -1088,6 +1088,9 @@ function selectShopEvent(id) {
     `<option value="${t.id}">${esc(t.name)} — ${money(t.price)}</option>`).join("");
   $("shopForm").classList.remove("hidden");
   $("shopDone").classList.add("hidden");
+  const bank = ((shopData && shopData.bank_details) || "").trim();
+  $("shopFormBankBox").classList.toggle("hidden", !bank);
+  if (bank) $("shopFormBank").textContent = bank;
   updateShopTotal();
   $("shopForm").scrollIntoView({ behavior: "smooth", block: "start" });
 }
