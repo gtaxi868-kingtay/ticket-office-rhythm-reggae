@@ -424,7 +424,24 @@ function openTicket(event, ticket) {
     </div>
     <div class="admit">ADMIT ONE</div>`;
   $("ticketModal").classList.remove("hidden");
-  if (window.QRCode) QRCode.toCanvas($("ticketQr"), qrPayload(ticket), { width: 180, margin: 1 }).catch(() => {});
+  drawQr($("ticketQr"), qrPayload(ticket), 180);
+}
+
+/* Draw a QR code onto a canvas using the vendored qrcodejs build (no CDN —
+   a ticket must render even on venue Wi-Fi). Falls back silently: the
+   printed verify code below the QR still proves the ticket. */
+function drawQr(canvas, text, size) {
+  if (!canvas || !window.QRCode) return;
+  try {
+    const tmp = document.createElement("div");
+    new QRCode(tmp, { text: text, width: size, height: size, correctLevel: QRCode.CorrectLevel.M });
+    const src = tmp.querySelector("canvas");
+    if (!src) return;
+    canvas.width = size; canvas.height = size;
+    const c2 = canvas.getContext("2d");
+    c2.fillStyle = "#fff"; c2.fillRect(0, 0, size, size);
+    c2.drawImage(src, 0, 0, size, size);
+  } catch (e) { /* verify code still printed */ }
 }
 
 /* Draw the downloadable ticket image: FULL flyer (natural ratio, never
@@ -468,10 +485,9 @@ async function downloadTicketImage() {
   ctx.fillText("Buyer: " + (ticket.buyer_name || "—"), W / 2, y); y += 44;
   ctx.font = "26px sans-serif"; ctx.fillStyle = "#6B7699";
   ctx.fillText((ticket.type_name || "") + " • " + money(ticket.price) + " • " + (ticket.paid ? "PAID" : "UNPAID"), W / 2, y); y += 26;
-  if (window.QRCode) {
-    const qc = document.createElement("canvas");
-    try { await QRCode.toCanvas(qc, qrPayload(ticket), { width: 220, margin: 1 }); ctx.drawImage(qc, W / 2 - 110, y); } catch (e) {}
-  }
+  const qc = document.createElement("canvas");
+  drawQr(qc, qrPayload(ticket), 220);
+  if (qc.width) ctx.drawImage(qc, W / 2 - 110, y);
   y += 248;
   ctx.fillStyle = "#17203A"; ctx.font = "800 46px monospace"; ctx.fillText(ticket.code, W / 2, y); y += 42;
   ctx.font = "28px sans-serif"; ctx.fillStyle = "#6B7699";
@@ -581,7 +597,7 @@ async function doCheckin(code, verify) {
   let r;
   try { r = await authed("checkin", { p_code: code, p_verify_code: verify }); }
   catch (err) { doorShow("bad", err.message); return; }
-  const sub = [r.buyer_name, r.type_name].filter(Boolean).join(" • ");
+  const sub = [r.buyer_name, r.type_name, r.paid === false ? "UNPAID" : null].filter(Boolean).join(" • ");
   doorShow(r.status, r.message || r.status, sub);
   if (r.status === "valid") { $("doorCode").value = ""; $("doorVerify").value = ""; }
   updateDoorCount();
