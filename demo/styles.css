@@ -213,6 +213,5 @@ input:focus, select:focus { border-color: var(--violet); }
 .back-btn { margin-bottom: 6px; }
 @media print {
   .topbar, .menu, main, .modal, #toast, .no-print { display: none !important; }
-  #printSheet { position: static !important; display: block !important; overflow: visible !important; padding: 0; }
-  #printSheet.hidden { display: block !important; }
+  #printSheet { position: static !important; overflow: visible !important; padding: 0; }
 }
