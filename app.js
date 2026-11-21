@@ -678,7 +678,7 @@ function openPrintSheet() {
   const c = window.__lastCash;
   if (!c) { toast("Nothing to print yet \u2014 no sales for this event."); return; }
   const now = new Date().toLocaleString();
-  $("printSheetBody").innerHTML = `<h2 style="margin:0 0 4px">${esc(state.business || "Ticket Office")}</h2>
+  $("printSheetBody").innerHTML = `<h2 style="margin:0 0 4px">${esc((session && session.tenant && session.tenant.business_name) || "Ticket Office")}</h2>
     <h3 style="margin:0 0 2px">Cash-up \u2014 ${esc(c.eventName)}</h3>
     <p class="muted" style="margin:0 0 14px">Printed ${esc(now)}</p>` +
     c.rows.map((x) => `<div class="breakdown-row"><span>${esc(x.seller)}<br>
