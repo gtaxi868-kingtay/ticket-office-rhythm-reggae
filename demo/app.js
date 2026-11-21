@@ -1016,6 +1016,8 @@ function wire() {
 
   $("ticketClose").addEventListener("click", () => $("ticketModal").classList.add("hidden"));
   $("ticketBackIssue").addEventListener("click", () => { $("ticketModal").classList.add("hidden"); go("issue"); });
+  $("themeFab").addEventListener("click", toggleTheme);
+  applyTheme(document.documentElement.dataset.theme || "day");
   $("openShopBtn").addEventListener("click", openShop);
   $("shopBack").addEventListener("click", () => {
     $("shopScreen").classList.add("hidden");
@@ -1037,6 +1039,17 @@ function wire() {
   $("ticketDownload").addEventListener("click", downloadTicketImage);
 }
 
+
+/* ---------------- theme (day / night) ---------------- */
+function applyTheme(name) {
+  document.documentElement.dataset.theme = name;
+  try { localStorage.setItem("to_theme", name); } catch (e) {}
+  $("themeIconMoon").classList.toggle("hidden", name === "night");
+  $("themeIconSun").classList.toggle("hidden", name !== "night");
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === "night" ? "day" : "night");
+}
 
 /* ---------------- buyer shop (public) ---------------- */
 let shopData = null;   // public_shop result
