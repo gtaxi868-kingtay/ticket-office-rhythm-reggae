@@ -1093,15 +1093,45 @@ function shopUnitPrice() {
 }
 function updateShopTotal() { $("shopTotal").textContent = money(shopUnitPrice() * Math.max(1, Number($("shopQty").value || 1))); }
 
+async function uploadReceipt(file) {
+  if (file.size > 6 * 1024 * 1024) throw new Error("That file is too big — keep it under 6 MB.");
+  let blob = file, ext = (file.name.split(".").pop() || "bin").toLowerCase();
+  if (file.type.startsWith("image/") && file.type !== "image/jpeg") {
+    // Shrink big screenshots to a reasonable JPEG before upload.
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+    const cv = document.createElement("canvas");
+    cv.width = Math.round(bmp.width * scale); cv.height = Math.round(bmp.height * scale);
+    cv.getContext("2d").drawImage(bmp, 0, 0, cv.width, cv.height);
+    blob = await new Promise((res) => cv.toBlob(res, "image/jpeg", 0.85));
+    ext = "jpg";
+  }
+  const name = Date.now() + "-" + Math.random().toString(36).slice(2, 10) + "." + ext;
+  const res = await fetch(CFG.SUPABASE_URL.replace(/\/$/, "") + "/storage/v1/object/receipts/" + name, {
+    method: "POST",
+    headers: { "apikey": CFG.ANON_KEY, "Authorization": "Bearer " + CFG.ANON_KEY, "Content-Type": blob.type || file.type || "application/octet-stream" },
+    body: blob
+  });
+  if (!res.ok) throw new Error("The receipt could not be uploaded. Check your connection and try again.");
+  return CFG.SUPABASE_URL.replace(/\/$/, "") + "/storage/v1/object/public/receipts/" + name;
+}
+
 async function submitShopOrder(ev) {
   ev.preventDefault();
   showErr("shopError", "");
+  let receiptUrl = "";
+  const f = $("shopReceipt").files && $("shopReceipt").files[0];
+  if (f) {
+    try { receiptUrl = await uploadReceipt(f); }
+    catch (e) { showErr("shopError", e.message); return; }
+  }
   let r;
   try {
     r = await rpc("place_order", {
       p_slug: CFG.TENANT_SLUG, p_event_id: shopEvent.id, p_type_id: $("shopType").value,
       p_qty: Number($("shopQty").value || 1),
-      p_buyer_name: $("shopName").value.trim(), p_buyer_whatsapp: $("shopPhone").value.trim()
+      p_buyer_name: $("shopName").value.trim(), p_buyer_whatsapp: $("shopPhone").value.trim(),
+      p_receipt_url: receiptUrl || null
     });
   } catch (e) { showErr("shopError", e.message); return; }
   if (!r.ok) { showErr("shopError", r.message || "Could not place the order."); return; }
@@ -1110,7 +1140,8 @@ async function submitShopOrder(ev) {
   $("shopDoneText").textContent = "Thank you, " + $("shopName").value.trim() + ". Your order: " +
     r.qty + " × " + r.type_name + " for " + r.event_name + " — total " + money(r.total) + ". " +
     "Pay by bank transfer below, then send your order to the organiser on WhatsApp. " +
-    "Your tickets are confirmed once the organiser accepts the order.";
+    "Your tickets are confirmed once the organiser accepts the order." +
+    (receiptUrl ? " Your receipt was attached to the order." : "");
   const bank = (r.bank_details || "").trim();
   $("shopBankBox").classList.toggle("hidden", !bank);
   if (bank) $("shopBank").textContent = bank;
@@ -1142,6 +1173,7 @@ async function loadOrders() {
         <span class="chip ${o.status === "new" ? "" : o.status === "issued" ? "used" : "void"}">${esc(o.status.toUpperCase())}</span>
       </div>
       ${o.buyer_whatsapp ? `<div><a href="https://wa.me/${esc(o.buyer_whatsapp.replace(/[^0-9]/g, ""))}" target="_blank" rel="noopener">Message buyer on WhatsApp</a></div>` : ""}
+      ${o.receipt_url ? `<div><a href="${esc(o.receipt_url)}" target="_blank" rel="noopener">View payment receipt</a></div>` : ""}
       ${o.status === "new" ? `<div style="margin-top:8px">
         <button type="button" class="btn primary small" data-convert="${o.id}">Issue tickets (unpaid)</button>
         <button type="button" class="btn ghost small" data-decline="${o.id}">Decline</button></div>` : ""}
