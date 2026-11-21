@@ -1017,7 +1017,11 @@ function wire() {
   $("ticketClose").addEventListener("click", () => $("ticketModal").classList.add("hidden"));
   $("ticketBackIssue").addEventListener("click", () => { $("ticketModal").classList.add("hidden"); go("issue"); });
   $("openShopBtn").addEventListener("click", openShop);
-  $("shopBack").addEventListener("click", () => { $("shopScreen").classList.add("hidden"); $("loginScreen").classList.remove("hidden"); bootLogin(); });
+  $("shopBack").addEventListener("click", () => {
+    $("shopScreen").classList.add("hidden");
+    if (session && session.token) { $("app").classList.remove("hidden"); }
+    else { $("loginScreen").classList.remove("hidden"); bootLogin(); }
+  });
   $("shopForm").addEventListener("submit", submitShopOrder);
   $("shopType").addEventListener("change", updateShopTotal);
   $("shopQty").addEventListener("input", updateShopTotal);
@@ -1200,7 +1204,11 @@ async function loadOrders() {
 document.addEventListener("DOMContentLoaded", () => {
   wire();
   loadSession();
-  if (session && session.token) {
+  if (new URLSearchParams(location.search).has("shop")) {
+    // A buyer link always opens the shop — even on a phone where a team
+    // member happens to be signed in.
+    openShop();
+  } else if (session && session.token) {
     // Validate the stored session cheaply; enterApp's first RPC will bounce
     // to login if it has expired.
     $("loginScreen").classList.add("hidden");
@@ -1210,8 +1218,6 @@ document.addEventListener("DOMContentLoaded", () => {
     $("graceBanner").classList.toggle("hidden", !session.grace);
     applyRoles();
     refreshEvents().then(() => go(role() === "door" ? "door" : "dashboard")).catch(() => forceSignOut());
-  } else if (new URLSearchParams(location.search).has("shop")) {
-    openShop();
   } else {
     bootLogin();
   }
