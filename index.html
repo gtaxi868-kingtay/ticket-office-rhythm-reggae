@@ -326,10 +326,11 @@
   <!-- Printable cash-up sheet: shown on screen first (with its own Back
        button), and it is the only thing that prints. -->
   <div id="printSheet" class="print-sheet hidden">
+    <button class="btn primary print-close-top" data-close-print>&#10005; Done &mdash; back to Cash-up</button>
     <div id="printSheetBody"></div>
     <div class="row-actions no-print">
       <button class="btn primary" id="doPrintBtn">Print / Save PDF</button>
-      <button class="btn" id="closePrintBtn">&larr; Back</button>
+      <button class="btn" id="closePrintBtn" data-close-print>&larr; Back</button>
     </div>
   </div>
 </body>

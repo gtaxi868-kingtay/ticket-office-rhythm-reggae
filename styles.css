@@ -211,6 +211,7 @@ input:focus, select:focus { border-color: var(--violet); }
 .print-sheet { position: fixed; inset: 0; z-index: 200; background: #fff; color: #17203A;
   overflow-y: auto; padding: 22px 18px 40px; }
 .print-sheet .breakdown-row { border-bottom: 1px solid #E3E8F4; }
+.print-close-top { position: sticky; top: 0; width: 100%; margin-bottom: 14px; z-index: 5; }
 .back-btn { margin-bottom: 6px; }
 @media print {
   .topbar, .menu, main, .modal, #toast, .no-print { display: none !important; }
