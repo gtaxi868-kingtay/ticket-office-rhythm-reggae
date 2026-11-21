@@ -293,3 +293,4 @@ html[data-theme="night"] .bank-box { background: #1E1418; border-color: var(--bo
 html[data-theme="night"] .order-row { background: var(--card); border-color: var(--border); }
 html[data-theme="night"] .event-card { background: var(--card); border-color: var(--border); }
 html[data-theme="night"] .toast { background: #7F1D1D; color: #fff; }
+html[data-theme="night"] .topbar { background: rgba(7, 4, 5, 0.92); }
