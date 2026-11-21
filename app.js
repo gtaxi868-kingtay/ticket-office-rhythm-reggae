@@ -501,6 +501,13 @@ async function downloadTicketImage() {
   a.download = ticket.code + ".png";
   a.href = cv.toDataURL("image/png");
   a.click();
+  // After the image is saved, take the seller straight back to issuing —
+  // the next buyer is waiting. (Door accounts stay on the door screen.)
+  $("ticketModal").classList.add("hidden");
+  if (role() === "owner" || role() === "seller") {
+    go("issue");
+    toast("Ticket image saved.");
+  }
 }
 
 /* ---------------- tickets registry ---------------- */
@@ -1000,6 +1007,7 @@ function wire() {
   });
 
   $("ticketClose").addEventListener("click", () => $("ticketModal").classList.add("hidden"));
+  $("ticketBackIssue").addEventListener("click", () => { $("ticketModal").classList.add("hidden"); go("issue"); });
   $("ticketDownload").addEventListener("click", downloadTicketImage);
 }
 
