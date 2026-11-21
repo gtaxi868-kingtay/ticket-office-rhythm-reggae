@@ -233,3 +233,63 @@ textarea { width: 100%; border: 1.5px solid #E3E8F4; border-radius: 12px; paddin
 .event-card { background: #fff; border: 1px solid #E3E8F4; border-radius: 20px; padding: 14px; margin-bottom: 14px; text-align: left; }
 .event-card img.poster { width: 100%; max-width: 100%; height: auto; display: block; border-radius: 14px; margin-bottom: 10px; }
 .event-card .event-meta { margin-bottom: 12px; line-height: 1.45; }
+
+/* ---------- responsive press feel (both themes) ---------- */
+.btn, .icon-btn, .stepper button, .menu button, .member-card, .theme-fab {
+  touch-action: manipulation;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:active, .icon-btn:active, .stepper button:active { transform: scale(0.96); }
+.menu button:active, .member-card:active { transform: scale(0.985); }
+
+/* ---------- theme toggle ---------- */
+.theme-fab { position: fixed; right: 16px; bottom: calc(16px + var(--safe-bottom)); z-index: 150;
+  width: 52px; height: 52px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: var(--card); color: var(--text); box-shadow: var(--shadow); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; }
+.theme-fab:active { transform: scale(0.94); }
+
+/* ---------- NIGHT MODE: black + deep red ---------- */
+html[data-theme="night"] {
+  --bg: #070405;
+  --card: #171013;
+  --text: #F5EDEE;
+  --muted: #B08A90;
+  --border: #3A2027;
+  --violet: #E5484D;
+  --blue: #B91C1C;
+  --grad: linear-gradient(135deg, #7F1D1D, #DC2626);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --good: #34D399;
+  --bad: #F87171;
+  --warn: #F2C14E;
+}
+html[data-theme="night"] body { background: var(--bg); }
+html[data-theme="night"] input, html[data-theme="night"] select, html[data-theme="night"] textarea {
+  background: #1E1418; color: var(--text); border-color: var(--border); }
+html[data-theme="night"] .btn { background: #2A161B; color: var(--text); }
+html[data-theme="night"] .btn.primary { background: var(--grad); color: #fff; box-shadow: 0 10px 24px rgba(220, 38, 38, 0.30); }
+html[data-theme="night"] .btn.ghost { background: transparent; color: var(--muted); }
+html[data-theme="night"] .btn.linklike { background: transparent; color: var(--violet); }
+html[data-theme="night"] .menu button:active { background: #2A161B; }
+html[data-theme="night"] .role-pill { background: #2A161B; color: #F2A0A5; }
+html[data-theme="night"] .role-pill.door { background: #0E2A20; color: var(--good); }
+html[data-theme="night"] .role-pill.seller { background: #2A1E0E; color: var(--warn); }
+html[data-theme="night"] .chip.paid { background: #0E2A20; }
+html[data-theme="night"] .chip.unpaid { background: #2A1E0E; }
+html[data-theme="night"] .chip.in { background: #2A161B; color: #F2A0A5; }
+html[data-theme="night"] .chip.void { background: #2A1215; }
+html[data-theme="night"] .door-result.valid { background: #0E2A20; }
+html[data-theme="night"] .door-result.used { background: #2A2110; }
+html[data-theme="night"] .door-result.bad { background: #2A1215; }
+html[data-theme="night"] .grace { background: #2A2110; border-color: #6B5518; color: var(--warn); }
+html[data-theme="night"] .add-card { background: #14090C; border-color: #5B2330; color: #F2A0A5; }
+html[data-theme="night"] .bar { background: #2A161B; }
+html[data-theme="night"] .dots span { background: #4A2530; }
+html[data-theme="night"] .dots span.on { background: var(--violet); }
+html[data-theme="night"] .switch { background: #3A2027; }
+html[data-theme="night"] .sheet-card button { background: #1E1418; }
+html[data-theme="night"] .bank-box { background: #1E1418; border-color: var(--border); color: var(--text); }
+html[data-theme="night"] .order-row { background: var(--card); border-color: var(--border); }
+html[data-theme="night"] .event-card { background: var(--card); border-color: var(--border); }
+html[data-theme="night"] .toast { background: #7F1D1D; color: #fff; }

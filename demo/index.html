@@ -17,6 +17,7 @@
 <script src="vendor/qrcode.min.js"></script>
 <script src="vendor/jsQR.min.js"></script>
 <script src="config.js"></script>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem("to_theme") || "day"; } catch (e) {}</script>
 </head>
 <body>
 
@@ -387,5 +388,9 @@
       <button class="btn" id="closePrintBtn" data-close-print>&larr; Back</button>
     </div>
   </div>
+<button id="themeFab" class="theme-fab" aria-label="Toggle night mode">
+  <svg viewBox="0 0 24 24" class="ic" id="themeIconMoon"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4a6.8 6.8 0 0 0 9.5 9.5Z"/></svg>
+  <svg viewBox="0 0 24 24" class="ic hidden" id="themeIconSun"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="5" y1="5" x2="6.8" y2="6.8"/><line x1="17.2" y1="17.2" x2="19" y2="19"/><line x1="19" y1="5" x2="17.2" y2="6.8"/><line x1="6.8" y1="17.2" x2="5" y2="19"/></svg>
+</button>
 </body>
 </html>
