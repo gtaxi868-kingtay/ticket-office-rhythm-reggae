@@ -1,0 +1,49 @@
+// Ticket Office service worker — caches the app shell so the app OPENS
+// offline after the first load (venue Wi-Fi is not required to open it).
+// Live data still needs a connection; sales/check-ins are never faked offline.
+const CACHE = "ticket-office-v1";
+const SHELL = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./app.js",
+  "./config.js",
+  "./manifest.webmanifest",
+  "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js",
+  "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"
+];
+
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE)
+      .then((c) => Promise.allSettled(SHELL.map((u) => c.add(u))))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (e) => {
+  const url = new URL(e.request.url);
+  // NEVER cache API calls — ticket data must always be live.
+  if (url.pathname.includes("/rest/v1/") || url.hostname.endsWith("supabase.co")) return;
+  if (e.request.method !== "GET") return;
+  e.respondWith(
+    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
+      const net = fetch(e.request).then((res) => {
+        if (res && res.status === 200 && (url.origin === location.origin || url.hostname === "cdn.jsdelivr.net")) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy));
+        }
+        return res;
+      }).catch(() => hit);
+      return hit || net;
+    })
+  );
+});
