@@ -1,7 +1,7 @@
 // Ticket Office service worker — caches the app shell so the app OPENS
 // offline after the first load (venue Wi-Fi is not required to open it).
 // Live data still needs a connection; sales/check-ins are never faked offline.
-const CACHE = "ticket-office-v4";
+const CACHE = "ticket-office-v5";
 const SHELL = [
   "./",
   "./index.html",
@@ -34,16 +34,16 @@ self.addEventListener("fetch", (e) => {
   // NEVER cache API calls — ticket data must always be live.
   if (url.pathname.includes("/rest/v1/") || url.hostname.endsWith("supabase.co")) return;
   if (e.request.method !== "GET") return;
+  // NETWORK-FIRST for the shell: an update can never serve a stale/mixed
+  // copy of the app (the mixed-version trap). Cache is the offline fallback
+  // only — the app needs a connection for live data anyway.
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => {
-      const net = fetch(e.request).then((res) => {
-        if (res && res.status === 200 && url.origin === location.origin) {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, copy));
-        }
-        return res;
-      }).catch(() => hit);
-      return hit || net;
-    })
+    fetch(e.request).then((res) => {
+      if (res && res.status === 200 && url.origin === location.origin) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
+      }
+      return res;
+    }).catch(() => caches.match(e.request, { ignoreSearch: true }))
   );
 });
