@@ -220,3 +220,11 @@ input:focus, select:focus { border-color: var(--violet); }
   .topbar, .menu, main, .modal, #toast, .no-print { display: none !important; }
   #printSheet { position: static !important; overflow: visible !important; padding: 0; }
 }
+
+/* Buyer shop + orders */
+.shop-entry { margin-top: 18px; text-align: left; }
+.bank-box { white-space: pre-wrap; word-break: break-word; background: #F2F5FB; border: 1px solid #E3E8F4;
+  border-radius: 14px; padding: 12px 14px; font: inherit; font-size: 14.5px; margin: 8px 0; }
+.order-row { border: 1px solid #E3E8F4; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; background: #fff; }
+.order-row .row-between { align-items: flex-start; }
+textarea { width: 100%; border: 1.5px solid #E3E8F4; border-radius: 12px; padding: 10px 12px; font: inherit; }
