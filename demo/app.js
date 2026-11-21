@@ -700,6 +700,13 @@ const onEl = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev,
 onEl("printCashBtn", "click", openPrintSheet);
 onEl("doPrintBtn", "click", () => window.print());
 onEl("closePrintBtn", "click", () => $("printSheet").classList.add("hidden"));
+/* Capture-phase delegation: any [data-close-print] tap closes the sheet,
+   ahead of every other handler — the exit can never be swallowed. */
+document.addEventListener("click", (e) => {
+  if (e.target && e.target.closest && e.target.closest("[data-close-print]")) {
+    $("printSheet").classList.add("hidden");
+  }
+}, true);
 document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => go(b.getAttribute("data-back"))));
 
 /* ---------------- events admin ---------------- */
