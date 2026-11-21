@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- iPhone-first PWA shell -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tickets">
+<meta name="theme-color" content="#7C3AED">
+<title>Ticket Office</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="https://sjrubwotogjaxzeapndh.supabase.co/storage/v1/object/public/app-rhythm-reggae/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://sjrubwotogjaxzeapndh.supabase.co/storage/v1/object/public/app-rhythm-reggae/icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+
+<!-- ===================== LOGIN / SETUP ===================== -->
+<section id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="brand-mark" aria-hidden="true"></div>
+    <h1 id="loginBiz">Ticket Office</h1>
+    <p class="muted" id="loginSub">Who's working?</p>
+
+    <!-- team picker -->
+    <div id="teamPicker"></div>
+    <div id="pinBox" class="hidden">
+      <p class="pin-for">PIN for <strong id="pinForName"></strong></p>
+      <input id="pinInput" type="password" inputmode="numeric" autocomplete="off"
+             maxlength="6" placeholder="••••" class="pin-input">
+      <p id="pinError" class="error hidden"></p>
+      <button id="pinGo" class="btn primary big">Sign in</button>
+      <button id="pinBack" class="btn ghost">Back</button>
+      <button id="forgotPin" class="btn linklike">Owner forgot PIN?</button>
+    </div>
+
+    <!-- first-run owner claim -->
+    <form id="claimForm" class="hidden">
+      <h2>Set up the owner account</h2>
+      <p class="muted">Your organiser gave you a claim code. Set your name and PIN —
+        you will get a recovery code. Keep it safe: it is the only way back in
+        if you forget your PIN.</p>
+      <label>Claim code<input id="claimCode" autocomplete="off" placeholder="F7K9-Q2XD"></label>
+      <label>Your name<input id="claimName" autocomplete="name" placeholder="Your full name"></label>
+      <label>Choose a PIN (4–6 digits)<input id="claimPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••"></label>
+      <label>Confirm PIN<input id="claimPin2" type="password" inputmode="numeric" maxlength="6" placeholder="••••"></label>
+      <p id="claimError" class="error hidden"></p>
+      <button type="submit" class="btn primary big">Create owner account</button>
+    </form>
+
+    <!-- recovery code shown once -->
+    <div id="recoveryBox" class="hidden">
+      <h2>Your recovery code</h2>
+      <p class="muted">Write this down and keep it somewhere safe. It is shown
+        <strong>once</strong>. If you ever forget your PIN, this code resets it.</p>
+      <div class="recovery-code" id="recoveryCode"></div>
+      <button id="recoveryDone" class="btn primary big">I saved it — continue</button>
+    </div>
+
+    <!-- owner PIN recovery -->
+    <form id="recoverForm" class="hidden">
+      <h2>Reset owner PIN</h2>
+      <label>Recovery code<input id="recoverCode" autocomplete="off" placeholder="TK-XXXX-XXXX"></label>
+      <label>New PIN (4–6 digits)<input id="recoverPin" type="password" inputmode="numeric" maxlength="6" placeholder="••••"></label>
+      <p id="recoverError" class="error hidden"></p>
+      <button type="submit" class="btn primary big">Reset PIN</button>
+      <button type="button" id="recoverBack" class="btn ghost">Back</button>
+    </form>
+
+    <p id="loginError" class="error hidden"></p>
+    <p class="tiny muted">Your account lives in the cloud — every phone on your
+      team sees the same sales, live.</p>
+  </div>
+</section>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand-mark small" aria-hidden="true"></div>
+      <div>
+        <div id="bizName" class="biz-name">Ticket Office</div>
+        <div id="screenName" class="screen-name">Dashboard</div>
+      </div>
+    </div>
+    <button id="menuBtn" class="icon-btn" aria-label="Menu">
+      <svg viewBox="0 0 24 24" class="ic"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </header>
+
+  <div id="graceBanner" class="grace hidden">
+    This account's licence has ended — you can view and export your records,
+    but selling is paused. Contact your provider to renew.
+  </div>
+
+  <nav id="menu" class="menu hidden">
+    <div class="menu-user" id="menuUser"></div>
+    <button data-go="dashboard">Dashboard</button>
+    <button data-go="issue" data-role="owner,seller">Issue tickets</button>
+    <button data-go="tickets" data-role="owner,seller">Tickets &amp; sales</button>
+    <button data-go="door">Door check-in</button>
+    <button data-go="cashup" data-role="owner">Cash-up</button>
+    <button data-go="events" data-role="owner">Events</button>
+    <button data-go="settings" data-role="owner">Settings &amp; team</button>
+    <button data-go="audit" data-role="owner">Activity log</button>
+    <button data-go="help">Help &amp; install</button>
+    <button id="switchUser">Switch user / Lock</button>
+    <button id="logoutBtn" class="danger">Log out</button>
+  </nav>
+
+  <main>
+    <!-- DASHBOARD: hero carousel + analytics only -->
+    <section id="screen-dashboard" class="screen">
+      <div id="heroCarousel" class="carousel"></div>
+      <div class="dots" id="heroDots"></div>
+      <h2 class="section-title">Analytics</h2>
+      <div id="analyticsBox"></div>
+    </section>
+
+    <!-- ISSUE -->
+    <section id="screen-issue" class="screen hidden">
+      <div class="card">
+        <h2>Issue tickets</h2>
+        <p class="muted">Selling as <strong id="issueSeller"></strong></p>
+        <label>Event<select id="issueEvent"></select></label>
+        <label>Ticket type<select id="issueType"></select></label>
+        <label>Buyer name<input id="issueBuyer" autocomplete="off" placeholder="Who is this ticket for?"></label>
+        <label>Buyer phone (optional)<input id="issuePhone" type="tel" autocomplete="off" placeholder="WhatsApp number"></label>
+        <label>Quantity</label>
+        <div class="stepper">
+          <button id="qtyMinus" type="button">−</button>
+          <span id="qtyVal">1</span>
+          <button id="qtyPlus" type="button">+</button>
+        </div>
+        <div class="total-line">Total: <strong id="issueTotal">TT$0</strong></div>
+        <label class="switch-row"><span>Paid</span>
+          <input type="checkbox" id="issuePaid" checked><span class="switch"></span></label>
+        <p id="issueError" class="error hidden"></p>
+        <button id="issueBtn" class="btn primary big">Generate tickets</button>
+      </div>
+      <div id="issuedBox"></div>
+    </section>
+
+    <!-- TICKETS -->
+    <section id="screen-tickets" class="screen hidden">
+      <div class="row-between">
+        <h2 class="section-title">Tickets &amp; sales</h2>
+        <button id="exportBtn" class="btn small" data-role="owner">Export CSV</button>
+      </div>
+      <label>Event<select id="ticketsEvent"></select></label>
+      <input id="ticketsSearch" placeholder="Search code or buyer name">
+      <div id="ticketsList"></div>
+    </section>
+
+    <!-- DOOR -->
+    <section id="screen-door" class="screen hidden">
+      <div class="card">
+        <h2>Door check-in</h2>
+        <label>Event<select id="doorEvent"></select></label>
+        <button id="scanBtn" class="btn primary big">Scan QR code</button>
+        <video id="scanVideo" class="scan-video hidden" playsinline muted></video>
+        <button id="scanStop" class="btn ghost hidden">Stop camera</button>
+        <div class="or">— or type the code —</div>
+        <label>Ticket code<input id="doorCode" autocomplete="off" placeholder="RR26-0001" class="mono big-input"></label>
+        <label>Verify code (from the ticket)<input id="doorVerify" inputmode="numeric" maxlength="6" placeholder="6 digits" class="mono big-input"></label>
+        <button id="checkinBtn" class="btn primary big">Check in</button>
+        <div id="doorResult" class="door-result hidden"></div>
+        <div id="doorCount" class="muted center"></div>
+      </div>
+    </section>
+
+    <!-- CASH-UP -->
+    <section id="screen-cashup" class="screen hidden">
+      <h2 class="section-title">Cash-up</h2>
+      <label>Event<select id="cashEvent"></select></label>
+      <div id="cashBox"></div>
+      <button class="btn" onclick="window.print()">Print cash-up</button>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="screen-events" class="screen hidden">
+      <h2 class="section-title">Events</h2>
+      <div id="eventsList"></div>
+      <form id="eventForm" class="card">
+        <h3 id="eventFormTitle">New event</h3>
+        <input type="hidden" id="evId">
+        <label>Event name<input id="evName" placeholder="Rhythm &amp; Reggae"></label>
+        <label>Presenter<input id="evPresenter" placeholder="1ST INFANTRY BN PRESENTS"></label>
+        <label>Code prefix (letters/numbers)<input id="evPrefix" maxlength="6" placeholder="RR26"></label>
+        <label>Date<input id="evDate" type="date"></label>
+        <label>Start time<input id="evStart" placeholder="7:00 PM"></label>
+        <label>End time<input id="evEnd" placeholder="1:00 AM"></label>
+        <label>Venue<input id="evVenue" placeholder="Camp Ogden"></label>
+        <label>Total capacity (blank = unlimited)<input id="evCapacity" type="number" min="1"></label>
+        <label>Flyer — full poster, never cropped
+          <input id="evFlyer" type="file" accept="image/*"></label>
+        <img id="evFlyerPreview" class="flyer-preview hidden" alt="Flyer preview">
+        <button type="button" id="evFlyerRemove" class="btn ghost hidden">Remove flyer</button>
+        <p id="evError" class="error hidden"></p>
+        <button type="submit" class="btn primary big">Save event</button>
+        <button type="button" id="evCancel" class="btn ghost hidden">Cancel edit</button>
+      </form>
+      <div id="typesBox" class="card hidden">
+        <h3>Ticket types — <span id="typesEventName"></span></h3>
+        <div id="typesList"></div>
+        <form id="typeForm">
+          <input type="hidden" id="tyId">
+          <label>Type name<input id="tyName" placeholder="General / VIP / Comp"></label>
+          <label>Price (TT$)<input id="tyPrice" type="number" min="0" step="0.01" placeholder="100"></label>
+          <label>Capacity (blank = unlimited)<input id="tyCapacity" type="number" min="1"></label>
+          <p id="tyError" class="error hidden"></p>
+          <button type="submit" class="btn primary">Save ticket type</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="screen-settings" class="screen hidden">
+      <div class="card">
+        <h2>My profile</h2>
+        <p class="muted">Signed in as <strong id="profileLine"></strong></p>
+        <label>Current PIN<input id="cpOld" type="password" inputmode="numeric" maxlength="6"></label>
+        <label>New PIN<input id="cpNew" type="password" inputmode="numeric" maxlength="6"></label>
+        <p id="cpError" class="error hidden"></p>
+        <button id="cpBtn" class="btn">Change my PIN</button>
+      </div>
+      <div class="card">
+        <h2>Business</h2>
+        <label>Business / organiser name<input id="setBiz"></label>
+        <label>Owner WhatsApp (sellers report sales here)<input id="setWhatsapp" type="tel" placeholder="1868..."></label>
+        <button id="setSave" class="btn">Save settings</button>
+      </div>
+      <div class="card">
+        <h2>Team</h2>
+        <div id="teamList"></div>
+        <form id="memberForm">
+          <h3>Add team member</h3>
+          <label>Name<input id="mbName" placeholder="Full name"></label>
+          <label>Role
+            <select id="mbRole"><option value="seller">Seller</option><option value="door">Door</option></select></label>
+          <label>First PIN (4–6 digits)<input id="mbPin" type="password" inputmode="numeric" maxlength="6"></label>
+          <p id="mbError" class="error hidden"></p>
+          <button type="submit" class="btn primary">Add member</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Your licence</h2>
+        <p id="licenceLine" class="muted"></p>
+      </div>
+    </section>
+
+    <!-- AUDIT -->
+    <section id="screen-audit" class="screen hidden">
+      <h2 class="section-title">Activity log</h2>
+      <div id="auditList"></div>
+    </section>
+
+    <!-- HELP -->
+    <section id="screen-help" class="screen hidden">
+      <div class="card">
+        <h2>Install on iPhone</h2>
+        <ol class="steps">
+          <li>Open this link in <strong>Safari</strong> (not inside WhatsApp).</li>
+          <li>Tap the <strong>Share</strong> button (square with an arrow pointing up).</li>
+          <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+          <li>Tap <strong>Add</strong>. The Tickets icon is now on your home screen.</li>
+          <li>Open it from the icon — it works full-screen and opens even with no signal after the first load.</li>
+        </ol>
+        <h3>Android</h3>
+        <ol class="steps">
+          <li>Open the link in Chrome.</li>
+          <li>Tap the <strong>⋮</strong> menu → <strong>Add to Home screen</strong> (or “Install app”).</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>How your team uses this</h2>
+        <ul class="steps">
+          <li><strong>Owner</strong> — sets up events, ticket types and the team; sees every sale live; does the cash-up.</li>
+          <li><strong>Sellers</strong> — sign in with their own PIN and sell. Every ticket they issue appears on the owner's phone at once, under their name. Codes are issued centrally, so two sellers can never sell the same ticket number.</li>
+          <li><strong>Door</strong> — sign in and scan each ticket's QR (or type the code + verify number). A ticket can only be let in once, on any phone — the second scan says ALREADY USED.</li>
+          <li><strong>Forgotten PIN?</strong> — sellers ask the owner to reset it in Settings. The owner uses the recovery code shown once at setup.</li>
+          <li><strong>No signal?</strong> — the app opens offline, but sales and check-ins need a connection to reach the shared system. Keep one phone on data at the door.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- EVENT OPTIONS SHEET -->
+<div id="sheet" class="sheet hidden">
+  <div class="sheet-card">
+    <h3 id="sheetTitle"></h3>
+    <button data-act="issue">Issue tickets</button>
+    <button data-act="tickets">View tickets &amp; sales</button>
+    <button data-act="door">Door check-in</button>
+    <button data-act="edit" data-role="owner">Edit event</button>
+    <button data-act="cashup" data-role="owner">Cash-up</button>
+    <button id="sheetClose" class="ghost">Close</button>
+  </div>
+</div>
+
+<!-- TICKET VIEW -->
+<div id="ticketModal" class="modal hidden">
+  <div class="modal-card" id="ticketCard"></div>
+  <div class="modal-actions">
+    <button id="ticketDownload" class="btn primary">Save ticket image</button>
+    <button id="ticketClose" class="btn ghost">Close</button>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="app.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+</script>
+</body>
+</html>
