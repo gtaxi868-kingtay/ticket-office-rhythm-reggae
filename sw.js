@@ -1,7 +1,7 @@
 // Ticket Office service worker — caches the app shell so the app OPENS
 // offline after the first load (venue Wi-Fi is not required to open it).
 // Live data still needs a connection; sales/check-ins are never faked offline.
-const CACHE = "ticket-office-v1";
+const CACHE = "ticket-office-v2";
 const SHELL = [
   "./",
   "./index.html",
@@ -9,8 +9,8 @@ const SHELL = [
   "./app.js",
   "./config.js",
   "./manifest.webmanifest",
-  "https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js",
-  "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"
+  "./vendor/qrcode.min.js",
+  "./vendor/jsQR.min.js"
 ];
 
 self.addEventListener("install", (e) => {
@@ -37,7 +37,7 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then((hit) => {
       const net = fetch(e.request).then((res) => {
-        if (res && res.status === 200 && (url.origin === location.origin || url.hostname === "cdn.jsdelivr.net")) {
+        if (res && res.status === 200 && url.origin === location.origin) {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(e.request, copy));
         }
