@@ -688,6 +688,10 @@ function openPrintSheet() {
      <div class="breakdown-row"><span>Total still owed</span><strong>${money(c.totOwed)}</strong></div>
      <p class="muted tiny">Expected cash = tickets each seller marked PAID. Count each seller's cash against their line before they leave.</p>`;
   $("printSheet").classList.remove("hidden");
+  // Wire the sheet's own buttons directly on the live elements every time it
+  // opens — dismissal can never be lost to a stale load-time wiring.
+  $("closePrintBtn").onclick = () => $("printSheet").classList.add("hidden");
+  $("doPrintBtn").onclick = () => window.print();
   window.scrollTo(0, 0);
 }
 /* Guarded wiring: if the page shell is an older cached copy without these
