@@ -176,10 +176,11 @@
 
     <!-- CASH-UP -->
     <section id="screen-cashup" class="screen hidden">
+      <button class="btn ghost back-btn" data-back="dashboard">&larr; Back</button>
       <h2 class="section-title">Cash-up</h2>
       <label>Event<select id="cashEvent"></select></label>
       <div id="cashBox"></div>
-      <button class="btn" onclick="window.print()">Print cash-up</button>
+      <button class="btn" id="printCashBtn">Print cash-up</button>
     </section>
 
     <!-- EVENTS -->
@@ -321,5 +322,15 @@
     window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
   }
 </script>
+
+  <!-- Printable cash-up sheet: shown on screen first (with its own Back
+       button), and it is the only thing that prints. -->
+  <div id="printSheet" class="print-sheet hidden">
+    <div id="printSheetBody"></div>
+    <div class="row-actions no-print">
+      <button class="btn primary" id="doPrintBtn">Print / Save PDF</button>
+      <button class="btn" id="closePrintBtn">&larr; Back</button>
+    </div>
+  </div>
 </body>
 </html>
