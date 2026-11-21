@@ -202,6 +202,7 @@ input:focus, select:focus { border-color: var(--violet); }
 /* ---------- toast / misc ---------- */
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(22px + var(--safe-bottom)); z-index: 210;
+  pointer-events: none;
   background: #17203A; color: #fff; padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: 14.5px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.3); max-width: 92vw; text-align: center;
 }
