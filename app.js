@@ -662,6 +662,7 @@ async function renderCashup() {
   if (!r.rows.length) { box.innerHTML = "<div class='card'><p class='muted'>No sales yet for this event.</p></div>"; return; }
   const totCash = r.rows.reduce((s, x) => s + Number(x.expected_cash), 0);
   const totOwed = r.rows.reduce((s, x) => s + Number(x.still_owed), 0);
+  window.__lastCash = { eventName: e.name, rows: r.rows, totCash, totOwed };
   box.innerHTML = `<div class="card"><h3>Cash-up — ${esc(e.name)}</h3>` +
     r.rows.map((x) => `<div class="breakdown-row"><span>${esc(x.seller)}<br>
       <span class="muted tiny">${x.tickets_sold} sold • ${x.checked_in} checked in</span></span>
@@ -670,6 +671,29 @@ async function renderCashup() {
      <div class="breakdown-row"><span>Total still owed</span><strong>${money(totOwed)}</strong></div></div>
      <p class="muted tiny">Expected cash = tickets each seller marked PAID. Count each seller's cash against their line before they leave.</p>`;
 }
+
+/* Print cash-up: build a clean sheet on screen first (never a blank print),
+   with a Back button that always works. */
+function openPrintSheet() {
+  const c = window.__lastCash;
+  if (!c) { toast("Nothing to print yet \u2014 no sales for this event."); return; }
+  const now = new Date().toLocaleString();
+  $("printSheetBody").innerHTML = `<h2 style="margin:0 0 4px">${esc(state.business || "Ticket Office")}</h2>
+    <h3 style="margin:0 0 2px">Cash-up \u2014 ${esc(c.eventName)}</h3>
+    <p class="muted" style="margin:0 0 14px">Printed ${esc(now)}</p>` +
+    c.rows.map((x) => `<div class="breakdown-row"><span>${esc(x.seller)}<br>
+      <span class="muted tiny">${x.tickets_sold} sold \u2022 ${x.checked_in} checked in</span></span>
+      <strong>${money(x.expected_cash)}${Number(x.still_owed) ? `<br><span class="muted tiny">still owed ${money(x.still_owed)}</span>` : ""}</strong></div>`).join("") +
+    `<div class="breakdown-row"><span><strong>Total cash expected</strong></span><strong>${money(c.totCash)}</strong></div>
+     <div class="breakdown-row"><span>Total still owed</span><strong>${money(c.totOwed)}</strong></div>
+     <p class="muted tiny">Expected cash = tickets each seller marked PAID. Count each seller's cash against their line before they leave.</p>`;
+  $("printSheet").classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+$("printCashBtn").addEventListener("click", openPrintSheet);
+$("doPrintBtn").addEventListener("click", () => window.print());
+$("closePrintBtn").addEventListener("click", () => $("printSheet").classList.add("hidden"));
+document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => go(b.getAttribute("data-back"))));
 
 /* ---------------- events admin ---------------- */
 function renderEvents() {
