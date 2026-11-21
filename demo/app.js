@@ -690,9 +690,12 @@ function openPrintSheet() {
   $("printSheet").classList.remove("hidden");
   window.scrollTo(0, 0);
 }
-$("printCashBtn").addEventListener("click", openPrintSheet);
-$("doPrintBtn").addEventListener("click", () => window.print());
-$("closePrintBtn").addEventListener("click", () => $("printSheet").classList.add("hidden"));
+/* Guarded wiring: if the page shell is an older cached copy without these
+   elements, skip instead of killing the whole script (mixed-version safety). */
+const onEl = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
+onEl("printCashBtn", "click", openPrintSheet);
+onEl("doPrintBtn", "click", () => window.print());
+onEl("closePrintBtn", "click", () => $("printSheet").classList.add("hidden"));
 document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", () => go(b.getAttribute("data-back"))));
 
 /* ---------------- events admin ---------------- */
