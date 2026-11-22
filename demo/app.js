@@ -308,7 +308,16 @@ async function renderAnalytics() {
   const paidPct = a.gross > 0 ? Math.round((a.paid_in / a.gross) * 100) : 0;
   const inPct = a.sold > 0 ? Math.round((a.checked_in / a.sold) * 100) : 0;
   const paidW = a.gross > 0 ? (a.paid_in / a.gross) * 100 : 0;
-  box.innerHTML = `
+  const target = e.target_amount ? Number(e.target_amount) : null;
+  const targetHtml = target ? (() => {
+    const pct = Math.min(100, Math.round((a.gross / target) * 100));
+    const avg = a.sold > 0 ? a.gross / a.sold : Math.min(...(e.types || []).filter((t) => !t.is_addon).map((t) => Number(t.price)).concat([100]));
+    const left = Math.max(0, Math.ceil((target - a.gross) / Math.max(avg, 1)));
+    return `<div class="card"><div class="lbl muted">Break-even target — ${money(a.gross)} of ${money(target)} (${pct}%)</div>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="muted tiny" style="margin-top:6px">${a.gross >= target ? "Target reached. Everything from here is profit." : "About " + left + " more ticket" + (left === 1 ? "" : "s") + " at the current average covers the target."}</div></div>`;
+  })() : "";
+  box.innerHTML = targetHtml + `
     <div class="stat-grid">
       <div class="stat"><div class="num">${a.sold}</div><div class="lbl">Sold</div></div>
       <div class="stat"><div class="num">${money(a.gross)}</div><div class="lbl">Gross</div></div>
@@ -421,6 +430,7 @@ function openTicket(event, ticket) {
       <div class="t-code mono">${esc(ticket.code)}</div>
       <div class="muted">Verify code: <strong class="mono">${esc(ticket.verify_code)}</strong></div>
       <div class="muted tiny">Sold by ${esc(ticket.seller_name || "")}</div>
+      <div class="muted tiny">Powered by Ticket Office</div>
     </div>
     <div class="admit">ADMIT ONE</div>`;
   $("ticketModal").classList.remove("hidden");
@@ -605,7 +615,12 @@ async function doCheckin(code, verify) {
   let r;
   try { r = await authed("checkin", { p_code: code, p_verify_code: verify }); }
   catch (err) { doorShow("bad", err.message); return; }
-  const sub = [r.buyer_name, r.type_name, r.paid === false ? "UNPAID" : null].filter(Boolean).join(" • ");
+  let firstIn = null;
+  if (r.status === "already_used" && r.checked_in_at) {
+    firstIn = "First let in " + new Date(r.checked_in_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) +
+      (r.checked_in_by ? " by " + r.checked_in_by : "");
+  }
+  const sub = [r.buyer_name, r.type_name, r.paid === false ? "UNPAID" : null, firstIn].filter(Boolean).join(" • ");
   doorShow(r.status, r.message || r.status, sub);
   if (r.status === "valid") { $("doorCode").value = ""; $("doorVerify").value = ""; }
   updateDoorCount();
@@ -737,6 +752,23 @@ function renderEvents() {
   }));
 }
 
+function fillExtras(e) {
+  $("evTarget").value = e && e.target_amount != null ? e.target_amount : "";
+  $("evPlanPct").value = e && e.payment_plan_pct != null ? e.payment_plan_pct : "";
+  const qs = e && Array.isArray(e.checkout_questions) ? e.checkout_questions : [];
+  $("evQ1").value = qs[0] || ""; $("evQ2").value = qs[1] || ""; $("evQ3").value = qs[2] || "";
+}
+async function saveExtras(eventId) {
+  const questions = [$("evQ1").value, $("evQ2").value, $("evQ3").value].map((s) => s.trim()).filter(Boolean);
+  try {
+    await authed("update_event_extras", {
+      p_event_id: eventId,
+      p_target_amount: $("evTarget").value ? Number($("evTarget").value) : null,
+      p_payment_plan_pct: $("evPlanPct").value ? Number($("evPlanPct").value) : null,
+      p_checkout_questions: questions
+    });
+  } catch (e) { /* extras are best-effort; the event itself saved */ }
+}
 function fillEventForm(id) {
   const e = eventsCache.find((x) => x.id === id); if (!e) return;
   activeEventId = id;
@@ -750,6 +782,7 @@ function fillEventForm(id) {
   if (e.flyer_url) $("evFlyerPreview").src = e.flyer_url;
   $("evFlyerRemove").classList.toggle("hidden", !e.flyer_url);
   $("evCancel").classList.remove("hidden");
+  fillExtras(e);
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
 }
 function resetEventForm() {
@@ -759,6 +792,7 @@ function resetEventForm() {
   flyerDataUrl = ""; flyerTouched = false;
   $("evFlyerPreview").classList.add("hidden"); $("evFlyerRemove").classList.add("hidden");
   $("evCancel").classList.add("hidden");
+  fillExtras(null);
 }
 
 /* Flyer handling: the picked image is downscaled to max 1200px wide JPEG and
@@ -815,6 +849,8 @@ async function saveEvent(ev) {
     }
   } catch (err) { showErr("evError", err.message); return; }
   if (!r.ok) { showErr("evError", r.message || "Could not save the event."); return; }
+  const savedId = id || r.id;
+  if (savedId) await saveExtras(savedId);
   toast("Event saved.");
   resetEventForm();
   await refreshEvents();
@@ -830,12 +866,13 @@ function openTypes(eventId) {
   $("typesEventName").textContent = e.name;
   $("typesBox").classList.remove("hidden");
   $("typesList").innerHTML = (e.types || []).map((t) => `
-    <div class="breakdown-row"><span>${esc(t.name)} — ${money(t.price)}${t.capacity ? " • cap " + t.capacity : ""}${t.is_active ? "" : " • off"}</span>
+    <div class="breakdown-row"><span>${esc(t.name)} — ${money(t.price)}${t.capacity ? " • cap " + t.capacity : ""}${t.is_addon ? " • add-on" : ""}${t.is_active ? "" : " • off"}</span>
     <button class="btn small" data-tyedit="${t.id}">Edit</button></div>`).join("");
   $("typesList").querySelectorAll("[data-tyedit]").forEach((b) => b.addEventListener("click", () => {
     const t = (e.types || []).find((x) => x.id === b.getAttribute("data-tyedit"));
     if (!t) return;
     $("tyId").value = t.id; $("tyName").value = t.name; $("tyPrice").value = t.price; $("tyCapacity").value = t.capacity || "";
+    $("tyAddon").checked = !!t.is_addon;
   }));
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
 }
@@ -847,11 +884,12 @@ async function saveType(ev) {
     r = await authed("upsert_ticket_type", {
       p_event_id: typesEventId, p_type_id: $("tyId").value || null,
       p_name: $("tyName").value.trim(), p_price: Number($("tyPrice").value || 0),
-      p_capacity: $("tyCapacity").value ? Number($("tyCapacity").value) : null, p_is_active: true
+      p_capacity: $("tyCapacity").value ? Number($("tyCapacity").value) : null, p_is_active: true,
+      p_is_addon: $("tyAddon").checked
     });
   } catch (err) { showErr("tyError", err.message); return; }
   if (!r.ok) { showErr("tyError", r.message || "Could not save."); return; }
-  $("tyId").value = ""; $("tyName").value = ""; $("tyPrice").value = ""; $("tyCapacity").value = "";
+  $("tyId").value = ""; $("tyName").value = ""; $("tyPrice").value = ""; $("tyCapacity").value = ""; $("tyAddon").checked = false;
   toast("Ticket type saved.");
   await refreshEvents(); openTypes(typesEventId);
   if (currentScreen === "issue") fillIssueTypes();
@@ -863,6 +901,7 @@ async function renderSettings() {
   $("setBiz").value = session.tenant.business_name || "";
   $("setWhatsapp").value = session.tenant.owner_whatsapp || "";
   $("setBank").value = session.tenant.bank_details || "";
+  $("setCardLink").value = session.tenant.card_link || "";
   $("shopLink").textContent = shopUrl();
   $("licenceLine").textContent = session.grace
     ? "Licence has ENDED — you are in read-only grace. Contact your provider to renew."
@@ -1003,12 +1042,13 @@ function wire() {
     catch (err) { toast(err.message); return; }
     if (!r.ok) { toast(r.message || "Could not save."); return; }
     try {
-      const rb = await authed("update_bank_details", { p_bank_details: $("setBank").value });
+      const rb = await authed("update_payment_details", { p_bank_details: $("setBank").value, p_card_link: $("setCardLink").value.trim() });
       if (!rb.ok) { toast(rb.message || "Bank details could not be saved."); return; }
     } catch (err) { toast(err.message); return; }
     session.tenant.business_name = $("setBiz").value.trim();
     session.tenant.owner_whatsapp = $("setWhatsapp").value.trim();
     session.tenant.bank_details = $("setBank").value;
+    session.tenant.card_link = $("setCardLink").value.trim();
     saveSession();
     $("bizName").textContent = session.tenant.business_name || "Ticket Office";
     toast("Settings saved.");
@@ -1016,6 +1056,25 @@ function wire() {
 
   $("ticketClose").addEventListener("click", () => $("ticketModal").classList.add("hidden"));
   $("ticketBackIssue").addEventListener("click", () => { $("ticketModal").classList.add("hidden"); go("issue"); });
+  $("ticketCal").addEventListener("click", () => { if (currentTicket) icsFor(currentTicket.event); });
+  $("ticketTransfer").addEventListener("click", async () => {
+    if (!currentTicket || !currentTicket.ticket) return;
+    const tk = currentTicket.ticket;
+    if (!tk.id) { toast("Open this ticket from Tickets & sales to transfer it."); return; }
+    const name = prompt("Transfer to — new holder's full name:");
+    if (!name) return;
+    const phone = prompt("New holder's WhatsApp number (optional):", "") || "";
+    let r;
+    try { r = await authed("transfer_ticket", { p_ticket_id: tk.id, p_new_name: name.trim(), p_new_phone: phone.trim() }); }
+    catch (e) { toast(e.message); return; }
+    if (!r.ok) { toast(r.message || "Could not transfer."); return; }
+    const nt = (r.tickets || [])[0] || {};
+    toast("Transferred. New code: " + nt.code + " — the old ticket no longer works.");
+    openTicket(currentTicket.event, { id: null, code: nt.code, verify_code: nt.verify_code,
+      type_name: nt.type_name || tk.type_name, price: nt.price != null ? nt.price : tk.price,
+      paid: tk.paid, buyer_name: name.trim(), seller_name: session.member.name });
+    loadTickets();
+  });
   $("themeFab").addEventListener("click", toggleTheme);
   applyTheme(document.documentElement.dataset.theme || "day");
   $("openShopBtn").addEventListener("click", openShop);
@@ -1025,8 +1084,7 @@ function wire() {
     else { $("loginScreen").classList.remove("hidden"); bootLogin(); }
   });
   $("shopForm").addEventListener("submit", submitShopOrder);
-  $("shopType").addEventListener("change", updateShopTotal);
-  $("shopQty").addEventListener("input", updateShopTotal);
+  $("shopCalBtn").addEventListener("click", () => { if (lastShopOrder) icsFor(lastShopOrder.event); });
   $("shopAgain").addEventListener("click", () => { $("shopDone").classList.add("hidden"); openShop(); });
   $("shopCopyBank").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText($("shopBank").textContent); toast("Bank details copied."); }
@@ -1093,25 +1151,121 @@ async function openShop() {
     b.addEventListener("click", () => selectShopEvent(b.getAttribute("data-shop-ev"))));
 }
 
+/* Checkout: pick quantities across ticket types and add-ons, answer the
+   organiser's questions, see the full summary before placing the order. */
+let shopCart = {};
+let lastShopOrder = null;
+
 function selectShopEvent(id) {
   shopEvent = (shopData.events || []).find((e) => e.id === id);
   if (!shopEvent) return;
+  shopCart = {};
   $("shopFormTitle").textContent = "Order — " + shopEvent.name;
-  $("shopType").innerHTML = (shopEvent.types || []).map((t) =>
-    `<option value="${t.id}">${esc(t.name)} — ${money(t.price)}</option>`).join("");
+  renderShopTypes();
+  renderShopQuestions();
   $("shopForm").classList.remove("hidden");
   $("shopDone").classList.add("hidden");
   const bank = ((shopData && shopData.bank_details) || "").trim();
   $("shopFormBankBox").classList.toggle("hidden", !bank);
   if (bank) $("shopFormBank").textContent = bank;
-  updateShopTotal();
+  updateShopSummary();
   $("shopForm").scrollIntoView({ behavior: "smooth", block: "start" });
 }
-function shopUnitPrice() {
-  const t = (shopEvent.types || []).find((x) => x.id === $("shopType").value);
-  return t ? Number(t.price) : 0;
+
+function shopTypeRow(t) {
+  const q = shopCart[t.id] || 0;
+  return `<div class="type-row">
+    <div class="type-info"><strong>${esc(t.name)}</strong><span class="muted">${money(t.price)}</span></div>
+    <div class="stepper">
+      <button type="button" class="step-btn" data-step="${t.id}|-1" aria-label="One less">−</button>
+      <span class="step-qty" id="qty-${t.id}">${q}</span>
+      <button type="button" class="step-btn" data-step="${t.id}|1" aria-label="One more">+</button>
+    </div></div>`;
 }
-function updateShopTotal() { $("shopTotal").textContent = money(shopUnitPrice() * Math.max(1, Number($("shopQty").value || 1))); }
+
+function renderShopTypes() {
+  const types = (shopEvent.types || []).filter((t) => !t.is_addon);
+  const addons = (shopEvent.types || []).filter((t) => t.is_addon);
+  $("shopTypes").innerHTML = types.length
+    ? types.map(shopTypeRow).join("")
+    : "<p class=\"muted\">No tickets on sale for this event yet.</p>";
+  $("shopAddonsWrap").classList.toggle("hidden", !addons.length);
+  $("shopAddons").innerHTML = addons.map(shopTypeRow).join("");
+  [$("shopTypes"), $("shopAddons")].forEach((box) => box.querySelectorAll("[data-step]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const [id, d] = b.getAttribute("data-step").split("|");
+      shopCart[id] = Math.min(20, Math.max(0, (shopCart[id] || 0) + Number(d)));
+      const el = $("qty-" + id); if (el) el.textContent = shopCart[id];
+      updateShopSummary();
+    })));
+}
+
+function renderShopQuestions() {
+  const qs = Array.isArray(shopEvent.questions) ? shopEvent.questions : [];
+  $("shopQuestions").innerHTML = qs.map((q, i) =>
+    `<label>${esc(q)}<input id="shopQ${i}" data-question="${esc(q)}"></label>`).join("");
+}
+
+function shopLines() {
+  return (shopEvent.types || [])
+    .filter((t) => (shopCart[t.id] || 0) > 0)
+    .map((t) => ({ type: t, qty: shopCart[t.id] }));
+}
+function shopTotalCalc() {
+  return shopLines().reduce((s, l) => s + Number(l.type.price) * l.qty, 0);
+}
+
+function updateShopSummary() {
+  const lines = shopLines();
+  const total = shopTotalCalc();
+  const planPct = shopEvent && shopEvent.plan_pct ? Number(shopEvent.plan_pct) : null;
+  let html = lines.length
+    ? lines.map((l) => `<div class="breakdown-row"><span>${l.qty} × ${esc(l.type.name)}</span><strong>${money(Number(l.type.price) * l.qty)}</strong></div>`).join("")
+    : "<p class=\"muted\">Choose your tickets above.</p>";
+  if (lines.length) {
+    html += `<div class="breakdown-row total-row"><span>Total</span><strong>${money(total)}</strong></div>`;
+    if (planPct) {
+      const dep = Math.round(total * planPct) / 100;
+      html += `<p class="plan-note">Payment plan: pay a deposit of <strong>${money(dep)}</strong> (${planPct}%) to book, and the balance of <strong>${money(total - dep)}</strong> after — the organiser tracks it for you.</p>`;
+    }
+  }
+  $("shopSummary").innerHTML = html;
+}
+
+/* Add-to-calendar (.ics) built locally — event times are free text like
+   "7:00 PM", so parse them; an end time past midnight rolls to next day. */
+function icsFor(ev, label) {
+  const parse = (s) => {
+    const m = String(s || "").trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+    if (!m) return null;
+    let hh = Number(m[1]) % 12;
+    if (/pm/i.test(m[3] || "")) hh += 12;
+    return { hh, mm: Number(m[2] || 0) };
+  };
+  const d = String(ev.event_date || "").slice(0, 10).replace(/-/g, "");
+  if (!d) return null;
+  const st = parse(ev.start_time) || { hh: 19, mm: 0 };
+  let en = parse(ev.end_time) || { hh: 23, mm: 0 };
+  const start = new Date(Date.UTC(2000, 0, 1, st.hh, st.mm));
+  let end = new Date(Date.UTC(2000, 0, 1, en.hh, en.mm));
+  if (end <= start) end = new Date(end.getTime() + 24 * 3600 * 1000);
+  const stamp = (base, addDays) => {
+    const t = new Date(base.getTime() + addDays * 24 * 3600 * 1000);
+    return d + "T" + String(t.getUTCHours()).padStart(2, "0") + String(t.getUTCMinutes()).padStart(2, "0") + "00";
+  };
+  const endDay = end.getUTCDate() !== start.getUTCDate() ? 1 : 0;
+  const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Ticket Office//EN", "BEGIN:VEVENT",
+    "UID:" + Date.now() + "@ticketoffice", "DTSTAMP:" + stamp(start, 0),
+    "DTSTART:" + stamp(start, 0), "DTEND:" + stamp(end, endDay),
+    "SUMMARY:" + String(label || ev.name || "Event").replace(/[\n,;]/g, " "),
+    "LOCATION:" + String(ev.venue || "").replace(/[\n,;]/g, " "),
+    "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+  a.download = String(ev.name || "event").replace(/[^a-z0-9]+/gi, "-") + ".ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
 
 async function uploadReceipt(file) {
   if (file.size > 6 * 1024 * 1024) throw new Error("That file is too big — keep it under 6 MB.");
@@ -1139,6 +1293,13 @@ async function uploadReceipt(file) {
 async function submitShopOrder(ev) {
   ev.preventDefault();
   showErr("shopError", "");
+  const lines = shopLines();
+  if (!lines.length) { showErr("shopError", "Choose at least one ticket."); return; }
+  const answers = {};
+  document.querySelectorAll("#shopQuestions [data-question]").forEach((inp) => {
+    const v = inp.value.trim();
+    if (v) answers[inp.getAttribute("data-question")] = v;
+  });
   let receiptUrl = "";
   const f = $("shopReceipt").files && $("shopReceipt").files[0];
   if (f) {
@@ -1148,29 +1309,42 @@ async function submitShopOrder(ev) {
   let r;
   try {
     r = await rpc("place_order", {
-      p_slug: CFG.TENANT_SLUG, p_event_id: shopEvent.id, p_type_id: $("shopType").value,
-      p_qty: Number($("shopQty").value || 1),
+      p_slug: CFG.TENANT_SLUG, p_event_id: shopEvent.id,
+      p_lines: lines.map((l) => ({ type_id: l.type.id, qty: l.qty })),
       p_buyer_name: $("shopName").value.trim(), p_buyer_whatsapp: $("shopPhone").value.trim(),
-      p_receipt_url: receiptUrl || null
+      p_receipt_url: receiptUrl || null,
+      p_answers: Object.keys(answers).length ? answers : null
     });
   } catch (e) { showErr("shopError", e.message); return; }
   if (!r.ok) { showErr("shopError", r.message || "Could not place the order."); return; }
+  lastShopOrder = { event: shopEvent, result: r };
+  const linesText = lines.map((l) => l.qty + " × " + l.type.name).join(", ");
   $("shopForm").classList.add("hidden");
   $("shopDone").classList.remove("hidden");
-  $("shopDoneText").textContent = "Thank you, " + $("shopName").value.trim() + ". Your order: " +
-    r.qty + " × " + r.type_name + " for " + r.event_name + " — total " + money(r.total) + ". " +
-    "Pay by bank transfer below, then send your order to the organiser on WhatsApp. " +
+  $("shopDoneText").textContent = "Thank you, " + $("shopName").value.trim() + ". Your order " +
+    "(reference " + r.ref + "): " + linesText + " for " + r.event_name + " — total " + money(r.total) + ". " +
+    (r.deposit_due != null
+      ? "This event offers a payment plan: pay the deposit of " + money(r.deposit_due) + " now and the balance later. "
+      : "") +
+    "Pay using the details below, then send your order to the organiser on WhatsApp. " +
     "Your tickets are confirmed once the organiser accepts the order." +
     (receiptUrl ? " Your receipt was attached to the order." : "");
   const bank = (r.bank_details || "").trim();
   $("shopBankBox").classList.toggle("hidden", !bank);
   if (bank) $("shopBank").textContent = bank;
+  const card = (r.card_link || "").trim();
+  $("shopCardBox").classList.toggle("hidden", !card);
+  if (card) {
+    $("shopCardBtn").href = card;
+    $("shopCardNote").textContent = "Pay " + money(r.deposit_due != null ? r.deposit_due : r.total) +
+      " by card and use reference " + r.ref + " so the organiser can match your payment.";
+  }
   const num = (r.owner_whatsapp || "").replace(/[^0-9]/g, "");
   const wa = $("shopWa");
   if (num) {
-    const msg = "Hello " + shopData.business_name + ", I just ordered " + r.qty + " x " + r.type_name +
-      " for " + r.event_name + " (total " + money(r.total) + "). My name is " + $("shopName").value.trim() +
-      ". I am paying by bank transfer.";
+    const msg = "Hello " + shopData.business_name + ", I just ordered " + linesText +
+      " for " + r.event_name + " (total " + money(r.total) + ", reference " + r.ref + "). My name is " +
+      $("shopName").value.trim() + ". I am paying by " + (card ? "card / " : "") + "bank transfer.";
     wa.href = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
     wa.classList.remove("hidden");
   } else wa.classList.add("hidden");
@@ -1185,23 +1359,40 @@ async function loadOrders() {
   if (!r.ok) { box.innerHTML = ""; return; }
   const orders = r.orders || [];
   if (!orders.length) { box.innerHTML = "<p class=\"muted\">No buyer orders yet. Orders from the ticket shop land here.</p>"; return; }
-  box.innerHTML = orders.map((o) => `
+  box.innerHTML = orders.map((o) => {
+    const total = Number(o.total || 0), paidAmt = Number(o.paid_amount || 0);
+    const balance = Math.max(0, total - paidAmt);
+    const answers = o.answers && typeof o.answers === "object"
+      ? Object.entries(o.answers).map(([k, v]) => `<div class="tiny muted">${esc(k)}: ${esc(v)}</div>`).join("") : "";
+    return `
     <div class="order-row">
       <div class="row-between">
         <span><strong>${esc(o.buyer_name)}</strong> — ${esc(o.event_name)}<br>
-          ${o.qty} × ${esc(o.type_name)} • ${money(o.total)} • ${esc(new Date(o.created_at).toLocaleString())}</span>
+          ${(o.lines || []).map((l) => l.qty + " × " + esc(l.type_name) + (l.is_addon ? " (add-on)" : "")).join(", ")}<br>
+          ${money(total)}${paidAmt > 0 ? ` • paid ${money(paidAmt)}` : ""}${balance > 0 && o.status !== "declined" ? ` • balance ${money(balance)}` : ""} • ref ${esc(o.ref || "")} • ${esc(new Date(o.created_at).toLocaleString())}</span>
         <span class="chip ${o.status === "new" ? "" : o.status === "issued" ? "used" : "void"}">${esc(o.status.toUpperCase())}</span>
       </div>
+      ${answers}
       ${o.buyer_whatsapp ? `<div><a href="https://wa.me/${esc(o.buyer_whatsapp.replace(/[^0-9]/g, ""))}" target="_blank" rel="noopener">Message buyer on WhatsApp</a></div>` : ""}
       ${o.receipt_url ? `<div><a href="${esc(o.receipt_url)}" target="_blank" rel="noopener">View payment receipt</a></div>` : ""}
       ${o.status === "new" ? `<div style="margin-top:8px">
-        <button type="button" class="btn primary small" data-convert="${o.id}">Issue tickets (unpaid)</button>
-        <button type="button" class="btn ghost small" data-decline="${o.id}">Decline</button></div>` : ""}
-    </div>`).join("");
+        ${balance > 0 ? `<button type="button" class="btn small" data-pay="${o.group}">Record payment</button>` : ""}
+        <button type="button" class="btn primary small" data-convert="${o.group}">Issue tickets${paidAmt >= total ? " (paid)" : " (unpaid)"}</button>
+        <button type="button" class="btn ghost small" data-decline="${o.group}">Decline</button></div>` : ""}
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-pay]").forEach((b) => b.addEventListener("click", async () => {
+    const amt = prompt("Payment received toward this order (TT$):");
+    if (!amt) return;
+    const r2 = await authed("record_order_payment", { p_group: b.getAttribute("data-pay"), p_amount: Number(amt) })
+      .catch((e) => ({ ok: false, message: e.message }));
+    toast(r2.ok ? "Payment recorded. Balance: " + money(r2.balance) : (r2.message || "Could not record."));
+    if (r2.ok) loadOrders();
+  }));
   box.querySelectorAll("[data-convert]").forEach((b) => b.addEventListener("click", async () => {
     b.disabled = true;
     let r2;
-    try { r2 = await authed("convert_order", { p_order_id: b.getAttribute("data-convert") }); }
+    try { r2 = await authed("convert_order", { p_group: b.getAttribute("data-convert") }); }
     catch (e) { toast(e.message); b.disabled = false; return; }
     if (!r2.ok) { toast(r2.message || "Could not issue."); b.disabled = false; return; }
     toast("Tickets issued: " + (r2.tickets || []).map((t) => t.code).join(", "));
@@ -1209,7 +1400,7 @@ async function loadOrders() {
   }));
   box.querySelectorAll("[data-decline]").forEach((b) => b.addEventListener("click", async () => {
     let r2;
-    try { r2 = await authed("decline_order", { p_order_id: b.getAttribute("data-decline") }); }
+    try { r2 = await authed("decline_order", { p_group: b.getAttribute("data-decline") }); }
     catch (e) { toast(e.message); return; }
     if (!r2.ok) { toast(r2.message || "Could not decline."); return; }
     loadOrders();
