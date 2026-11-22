@@ -11,8 +11,8 @@
 <meta name="theme-color" content="#7C3AED">
 <title>Ticket Office</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="https://sjrubwotogjaxzeapndh.supabase.co/storage/v1/object/public/app-rhythm-reggae/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://sjrubwotogjaxzeapndh.supabase.co/storage/v1/object/public/app-rhythm-reggae/icons/icon-192.png">
 <link rel="stylesheet" href="styles.css">
 <script src="vendor/qrcode.min.js"></script>
 <script src="vendor/jsQR.min.js"></script>
@@ -94,9 +94,10 @@
     <div id="shopEvents"></div>
     <form id="shopForm" class="hidden">
       <h2 id="shopFormTitle">Order tickets</h2>
-      <label>Ticket type<select id="shopType"></select></label>
-      <label>How many?<input id="shopQty" type="number" min="1" max="20" value="1"></label>
-      <p>Total: <strong id="shopTotal"></strong></p>
+      <div id="shopTypes"></div>
+      <div id="shopAddonsWrap" class="hidden"><h3>Add-ons</h3><div id="shopAddons"></div></div>
+      <div id="shopQuestions"></div>
+      <div class="summary-box" id="shopSummary"></div>
       <label>Your name<input id="shopName" autocomplete="name" placeholder="Full name"></label>
       <label>Your WhatsApp number<input id="shopPhone" type="tel" placeholder="1868..."></label>
       <div id="shopFormBankBox" class="hidden">
@@ -116,9 +117,16 @@
         <pre id="shopBank" class="bank-box"></pre>
         <button id="shopCopyBank" type="button" class="btn">Copy bank details</button>
       </div>
+      <div id="shopCardBox" class="hidden">
+        <h3>Pay by card</h3>
+        <p class="muted" id="shopCardNote"></p>
+        <a id="shopCardBtn" class="btn big" target="_blank" rel="noopener">Pay by card</a>
+      </div>
+      <button id="shopCalBtn" type="button" class="btn">Add the event to my calendar</button>
       <a id="shopWa" class="btn primary big hidden" target="_blank" rel="noopener">Send order to the organiser on WhatsApp</a>
       <button id="shopAgain" type="button" class="btn ghost">Order more tickets</button>
     </div>
+    <p class="tiny muted" style="text-align:center;margin-top:14px">Powered by Ticket Office</p>
   </div>
 </section>
 
@@ -246,6 +254,11 @@
         <label>End time<input id="evEnd" placeholder="1:00 AM"></label>
         <label>Venue<input id="evVenue" placeholder="Camp Ogden"></label>
         <label>Total capacity (blank = unlimited)<input id="evCapacity" type="number" min="1"></label>
+        <label>Break-even target TT$ (optional)<input id="evTarget" type="number" min="0" step="0.01" placeholder="e.g. 15000"></label>
+        <label>Payment plan — deposit % buyers pay first (optional)<input id="evPlanPct" type="number" min="5" max="95" placeholder="e.g. 30"></label>
+        <label>Checkout question 1 (optional)<input id="evQ1" placeholder="e.g. Shirt size?"></label>
+        <label>Checkout question 2 (optional)<input id="evQ2" placeholder="e.g. Table or group name?"></label>
+        <label>Checkout question 3 (optional)<input id="evQ3" placeholder="e.g. How did you hear about us?"></label>
         <label>Flyer — full poster, never cropped
           <input id="evFlyer" type="file" accept="image/*"></label>
         <img id="evFlyerPreview" class="flyer-preview hidden" alt="Flyer preview">
@@ -262,6 +275,7 @@
           <label>Type name<input id="tyName" placeholder="General / VIP / Comp"></label>
           <label>Price (TT$)<input id="tyPrice" type="number" min="0" step="0.01" placeholder="100"></label>
           <label>Capacity (blank = unlimited)<input id="tyCapacity" type="number" min="1"></label>
+          <label class="check-row"><input id="tyAddon" type="checkbox"> This is an add-on (extra like parking or a cooler fee — not a ticket, no door code)</label>
           <p id="tyError" class="error hidden"></p>
           <button type="submit" class="btn primary">Save ticket type</button>
         </form>
@@ -285,6 +299,9 @@
         <label>Bank details buyers use to pay you
           <textarea id="setBank" rows="4" placeholder="Bank: ...&#10;Account name: ...&#10;Account number: ..."></textarea></label>
         <p class="tiny muted">Buyers see these in the ticket shop when they order, so they can pay by transfer.</p>
+        <label>Card payment link (optional — e.g. your Fygaro link)
+          <input id="setCardLink" type="url" placeholder="https://..."></label>
+        <p class="tiny muted">If you have a card payment link, buyers get a "Pay by card" button with their order total and reference. Leave blank to hide it.</p>
         <button id="setSave" class="btn">Save settings</button>
         <p class="tiny muted">Buyer shop link — send this to buyers:<br>
           <span id="shopLink"></span>
@@ -364,6 +381,8 @@
   <div class="modal-card" id="ticketCard"></div>
   <div class="modal-actions">
     <button id="ticketDownload" class="btn primary">Save ticket image</button>
+    <button id="ticketCal" class="btn">Add to calendar</button>
+    <button id="ticketTransfer" class="btn" data-role="owner,seller">Transfer ticket</button>
     <button id="ticketBackIssue" class="btn" data-role="owner,seller">&larr; Back to Issue tickets</button>
     <button id="ticketClose" class="btn ghost">Close</button>
   </div>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticket Office — Sell tickets the way Trinidad already pays</title>
+<meta name="description" content="Flat monthly rent for event ticketing in Trinidad & Tobago. Bank transfer, WhatsApp and card — your money goes straight to your own bank. No percentage of your gate, ever.">
+<style>
+  :root { --ink:#14161F; --muted:#5B6172; --violet:#6C4CF1; --blue:#2E7CF6; --red:#B91C1C; --line:#E3E8F4; --card:#fff; --bg:#F6F7FB; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 22px 0 6px; display:flex; align-items:center; gap:10px; }
+  .mark { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,var(--violet),var(--blue)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:19px; }
+  .brand { font-weight:800; font-size:19px; }
+  .hero { padding: 42px 0 10px; text-align:center; }
+  .hero h1 { font-size: clamp(30px, 6vw, 50px); line-height:1.08; margin: 0 0 14px; letter-spacing:-.5px; }
+  .hero h1 .grad { background:linear-gradient(90deg,var(--violet),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { font-size: clamp(16px, 2.6vw, 19px); color:var(--muted); max-width:640px; margin:0 auto 26px; line-height:1.55; }
+  .cta-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { display:inline-block; padding:14px 26px; border-radius:999px; font-weight:700; text-decoration:none; font-size:16px; }
+  .btn.primary { background:linear-gradient(135deg,var(--violet),var(--blue)); color:#fff; box-shadow:0 10px 24px rgba(108,76,241,.28); }
+  .btn.ghost { background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+  section { padding: 44px 0 6px; }
+  h2 { font-size: clamp(23px, 4vw, 30px); margin:0 0 8px; letter-spacing:-.3px; }
+  .sub { color:var(--muted); margin:0 0 22px; line-height:1.55; }
+  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:18px; overflow:hidden; box-shadow:0 4px 18px rgba(20,22,31,.06); }
+  th, td { padding:14px 16px; text-align:left; font-size:15px; border-bottom:1px solid var(--line); }
+  th { background:#FBFBFE; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  tr:last-child td { border-bottom:none; }
+  tr.us td { background:#F4F1FF; font-weight:700; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+  .feat { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+  .feat h3 { margin:0 0 6px; font-size:16.5px; }
+  .feat p { margin:0; color:var(--muted); font-size:14.5px; line-height:1.5; }
+  .price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .price { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:22px; text-align:center; }
+  .price.hot { border:2px solid var(--violet); }
+  .price .amt { font-size:34px; font-weight:800; margin:6px 0 2px; }
+  .price .per { color:var(--muted); font-size:14px; }
+  .price p { color:var(--muted); font-size:14.5px; line-height:1.5; }
+  .night { background:#0B0608; color:#F5EDEF; border-radius:24px; padding:30px 26px; margin-top:14px; }
+  .night h2 { color:#fff; }
+  .night p { color:#CBB9BE; line-height:1.6; margin:0; }
+  .night .accent { color:#FF6B6B; font-weight:700; }
+  footer { padding:44px 0 40px; text-align:center; color:var(--muted); font-size:14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">T</div>
+    <div class="brand">Ticket Office</div>
+  </header>
+
+  <div class="hero">
+    <h1>Sell tickets the way<br><span class="grad">Trinidad already pays.</span></h1>
+    <p>WhatsApp, bank transfer and card — with every seller accountable, a door that can't be fooled, and a cash-up sheet at the end of the night. One flat monthly rent. <strong>No percentage of your gate, ever</strong> — and your money lands in your own bank from the first sale.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="../demo/">Try the live demo</a>
+      <a class="btn ghost" href="../demo/?shop">See a buyer shop</a>
+    </div>
+  </div>
+
+  <section>
+    <h2>The maths, on one real night</h2>
+    <p class="sub">300 guests at TT$100 a ticket — a TT$30,000 gate. Here's what each platform takes out of it, and when you see your money.</p>
+    <table>
+      <tr><th>Platform</th><th>Their cut</th><th>Your money arrives</th></tr>
+      <tr><td>Island eTickets (8%)</td><td>TT$2,400</td><td>5 business days after the event</td></tr>
+      <tr><td>Taack (7% + TT$1.80/order)</td><td>≈ TT$2,100+</td><td>About 3 days after the event</td></tr>
+      <tr class="us"><td>Ticket Office</td><td>TT$299 — the month's rent, all events included</td><td>In your own bank account from the first sale</td></tr>
+    </table>
+    <p class="sub" style="margin-top:14px">One fete's Island fee pays for five months here.</p>
+  </section>
+
+  <section>
+    <h2>Everything the big platforms do — priced for the events they ignore</h2>
+    <p class="sub">Built for the 50-to-500-guest middle: fundraisers, school and church events, club fetes, boat rides, comedy and dance shows.</p>
+    <div class="grid">
+      <div class="feat"><h3>A real checkout</h3><p>Buyers pick tickets and add-ons with steppers, answer your questions, and see the full total before they commit — then pay by transfer, card link, and attach their receipt.</p></div>
+      <div class="feat"><h3>Payment plans</h3><p>Deposit today, balance later — tracked per order, so a TT$1,200 all-inclusive doesn't need TT$1,200 today. No card required.</p></div>
+      <div class="feat"><h3>Who sold what</h3><p>Every seller signs in with their own PIN. Every ticket carries their name. The cash-up sheet shows what each person owes you, ready to print.</p></div>
+      <div class="feat"><h3>A door that can't be fooled</h3><p>Codes are generated by the system and verified against a secret only the server holds. A used ticket says ALREADY USED — with the time and the name of who let it in first. Unpaid tickets are flagged on screen.</p></div>
+      <div class="feat"><h3>Transfers done safely</h3><p>A buyer can't come? Transfer the ticket to the new holder — the old code dies and a fresh one is issued. Screenshots can't get two people in.</p></div>
+      <div class="feat"><h3>Break-even, live</h3><p>Set your target and watch the dashboard count you toward it: how much is in, and how many more tickets cover the night.</p></div>
+    </div>
+    <div class="night">
+      <h2>And at the door, it goes <span class="accent">black &amp; red</span>.</h2>
+      <p>One tap on the moon button and the whole app — sellers, door, shop — switches to a black and deep-red night mode made for working a gate in the dark. Buttons answer the instant you touch them. Day or night, your flyer is never cropped: what your buyers screenshot and forward is your poster, whole.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Rent, not a cut</h2>
+    <p class="sub">Every event you run is included. No tiers, no add-on fees, no percentage.</p>
+    <div class="price-grid">
+      <div class="price hot">
+        <div>Founding</div>
+        <div class="amt">TT$299</div>
+        <div class="per">per month</div>
+        <p>First 10 organisers. Price locked for 12 months. All events, all features.</p>
+      </div>
+      <div class="price">
+        <div>Standard</div>
+        <div class="amt">TT$449</div>
+        <div class="per">per month</div>
+        <p>The same whole system, once the founding seats are gone.</p>
+      </div>
+      <div class="price">
+        <div>One-off event</div>
+        <div class="amt">TT$750</div>
+        <div class="per">per event</div>
+        <p>For a single night — a fundraiser, a reunion, a one-time show.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="text-align:center">
+    <h2>See it before you spend a cent</h2>
+    <p class="sub">The demo is the real product with test data — claim it, sell a ticket, scan it at the door.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="../demo/">Open the demo</a>
+    </div>
+  </section>
+
+  <footer>
+    Ticket Office — built in Trinidad &amp; Tobago.<br>
+    Your events advertise it for you: every ticket carries the name.
+  </footer>
+</div>
+</body>
+</html>
