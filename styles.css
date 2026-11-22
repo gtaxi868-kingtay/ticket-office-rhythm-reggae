@@ -338,3 +338,8 @@ html[data-theme="night"] input[type="file"]::file-selector-button {
 html[data-theme="night"] .step-btn { background: #241419; }
 html[data-theme="night"] .summary-box { background: #120A0D; }
 html[data-theme="night"] .plan-note { background: #241B08; border-color: #4A3A12; color: #E8CF8F; }
+
+/* Sign-in member cards follow night mode too (they were hard-coded light,
+   which left names white-on-white at night). */
+html[data-theme="night"] .member-card { background: #1D1116; }
+html[data-theme="night"] .member-card .role-pill { background: #2A161B; color: var(--text); }
