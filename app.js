@@ -26,6 +26,13 @@ function showErr(id, msg) {
   else e.classList.add("hidden");
 }
 
+/* The store this page serves: ?s=<slug> wins, then the deployment
+   default in config.js, else "" = the public home (events directory). */
+const ACTIVE_SLUG = (() => {
+  const fromUrl = new URLSearchParams(location.search).get("s");
+  return (fromUrl || CFG.TENANT_SLUG || "").trim().toLowerCase();
+})();
+
 /* ---------------- RPC ---------------- */
 async function rpc(fn, args = {}) {
   if (!CFG.SUPABASE_URL || !CFG.ANON_KEY) {
@@ -83,7 +90,7 @@ async function bootLogin() {
   $("recoveryBox").classList.add("hidden");
   $("teamPicker").innerHTML = "<p class='muted'>Loading your team…</p>";
   let info;
-  try { info = await rpc("public_team", { p_slug: CFG.TENANT_SLUG }); }
+  try { info = await rpc("public_team", { p_slug: ACTIVE_SLUG }); }
   catch (e) { $("teamPicker").innerHTML = ""; showErr("loginError", e.message); return; }
   if (!info.ok) { $("teamPicker").innerHTML = ""; showErr("loginError", info.message); return; }
   if (info.business_name) { $("loginBiz").textContent = info.business_name; document.title = info.business_name + " — Tickets"; }
@@ -115,7 +122,7 @@ async function bootLogin() {
 async function doLogin() {
   showErr("pinError", "");
   let r;
-  try { r = await rpc("login", { p_slug: CFG.TENANT_SLUG, p_name: selectedMember, p_pin: $("pinInput").value.trim() }); }
+  try { r = await rpc("login", { p_slug: ACTIVE_SLUG, p_name: selectedMember, p_pin: $("pinInput").value.trim() }); }
   catch (e) { showErr("pinError", e.message); return; }
   if (!r.ok) { showErr("pinError", r.message || "Could not sign in."); return; }
   session = r; saveSession(); enterApp();
@@ -129,7 +136,7 @@ async function doClaim(ev) {
   let r;
   try {
     r = await rpc("claim_tenant", {
-      p_slug: CFG.TENANT_SLUG, p_claim_code: $("claimCode").value.trim(),
+      p_slug: ACTIVE_SLUG, p_claim_code: $("claimCode").value.trim(),
       p_owner_name: $("claimName").value.trim(), p_pin: pin
     });
   } catch (e) { showErr("claimError", e.message); return; }
@@ -146,7 +153,7 @@ async function doRecover(ev) {
   let r;
   try {
     r = await rpc("recover_owner_pin", {
-      p_slug: CFG.TENANT_SLUG, p_recovery_code: $("recoverCode").value.trim(),
+      p_slug: ACTIVE_SLUG, p_recovery_code: $("recoverCode").value.trim(),
       p_new_pin: $("recoverPin").value.trim()
     });
   } catch (e) { showErr("recoverError", e.message); return; }
@@ -903,6 +910,7 @@ async function renderSettings() {
   $("setBank").value = session.tenant.bank_details || "";
   $("setCardLink").value = session.tenant.card_link || "";
   $("shopLink").textContent = shopUrl();
+  renderThemeGrid();
   $("licenceLine").textContent = session.grace
     ? "Licence has ENDED — you are in read-only grace. Contact your provider to renew."
     : "Licence active" + (session.tenant.licence_expires ? " until " + session.tenant.licence_expires : "") + ". Renewals are handled by your provider.";
@@ -1077,7 +1085,12 @@ function wire() {
   });
   $("themeFab").addEventListener("click", toggleTheme);
   applyTheme(document.documentElement.dataset.theme || "day");
+  if (session && session.tenant) applySkin(session.tenant.theme || "fintech");
   $("openShopBtn").addEventListener("click", openShop);
+  $("hostBtn").addEventListener("click", () => {
+    $("signupForm").classList.toggle("hidden");
+  });
+  $("signupForm").addEventListener("submit", submitSignup);
   $("shopBack").addEventListener("click", () => {
     $("shopScreen").classList.add("hidden");
     if (session && session.token) { $("app").classList.remove("hidden"); }
@@ -1109,12 +1122,111 @@ function toggleTheme() {
   applyTheme(document.documentElement.dataset.theme === "night" ? "day" : "night");
 }
 
+/* ---------------- store skins (per-tenant theme — "the mall") ---------------- */
+const SKINS = [
+  { key: "fintech", name: "Clean Fintech", dots: ["#7C3AED", "#3B82F6", "#F6F7FB"] },
+  { key: "gold", name: "Midnight Gold", dots: ["#D9A441", "#0A0806", "#F3EBDD"] },
+  { key: "pop", name: "Poster Pop", dots: ["#0E7C86", "#E85D1F", "#F2B035"] },
+  { key: "sunset", name: "Island Sunset", dots: ["#FF5E7E", "#FF9E4F", "#2A1A4A"] },
+  { key: "navy", name: "Royal Navy", dots: ["#0F2B52", "#C9A24B", "#F7F3EA"] },
+  { key: "mono", name: "Minimal Mono", dots: ["#111111", "#FFFFFF", "#E8E8E8"] },
+];
+function applySkin(key) {
+  const valid = SKINS.some((s) => s.key === key);
+  document.documentElement.dataset.skin = valid ? key : "fintech";
+  try { localStorage.setItem("to_skin", document.documentElement.dataset.skin); } catch (e) {}
+}
+function renderThemeGrid() {
+  const grid = $("themeGrid");
+  if (!grid) return;
+  const cur = (session && session.tenant && session.tenant.theme) || "fintech";
+  grid.innerHTML = SKINS.map((s) => `
+    <button type="button" class="theme-card ${s.key === cur ? "current" : ""}" data-skinpick="${s.key}">
+      <span class="theme-dots">${s.dots.map((d) => `<span class="theme-dot" style="background:${d}"></span>`).join("")}</span>
+      <span class="theme-name">${s.name}</span>
+      ${s.key === cur ? `<span class="theme-cur">Current</span>` : ""}
+    </button>`).join("");
+  grid.querySelectorAll("[data-skinpick]").forEach((b) => b.addEventListener("click", () => pickSkin(b.dataset.skinpick)));
+}
+async function pickSkin(key) {
+  try {
+    const r = await authed("update_theme", { p_theme: key });
+    if (!r.ok) { toast(r.message || "Could not change the theme."); return; }
+    session.tenant.theme = key;
+    try { localStorage.setItem("to_session", JSON.stringify(session)); } catch (e) {}
+    applySkin(key);
+    renderThemeGrid();
+    toast("Theme set — your shop wears it now.");
+  } catch (e) { toast(e.message); }
+}
+
+/* ---------------- public home: events directory + sign-up ---------------- */
+function goStore(slug) { location.href = location.pathname + "?s=" + encodeURIComponent(slug) + "&shop"; }
+function goStoreTeam(slug) { location.href = location.pathname + "?s=" + encodeURIComponent(slug); }
+
+async function openHome() {
+  $("loginScreen").classList.add("hidden");
+  $("app").classList.add("hidden");
+  $("shopScreen").classList.add("hidden");
+  $("homeScreen").classList.remove("hidden");
+  $("homeEvents").innerHTML = "<p class='muted'>Loading events…</p>";
+  let r;
+  try { r = await rpc("public_events", {}); }
+  catch (e) { $("homeEvents").innerHTML = "<p class='error'>" + esc(e.message) + "</p>"; return; }
+  const evs = (r && r.events) || [];
+  if (!evs.length) {
+    $("homeEvents").innerHTML = "<p class='muted'>No events on sale right now — check back soon.</p>";
+    return;
+  }
+  $("homeEvents").innerHTML = evs.map((e) => `
+    <div class="event-card">
+      ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
+      <div class="event-meta">
+        <strong>${esc(e.name)}</strong><br>
+        ${esc(fmtDate(e.event_date))} • ${esc(e.start_time || "")} • ${esc(e.venue || "")}<br>
+        <span class="tiny muted">by ${esc(e.business_name)}</span>
+        ${e.from_price != null ? `<span class="price-pill">from ${money(e.from_price)}</span>` : ""}
+      </div>
+      <button type="button" class="btn primary" data-store="${esc(e.slug)}">Get tickets</button>
+    </div>`).join("");
+  $("homeEvents").querySelectorAll("[data-store]").forEach((b) =>
+    b.addEventListener("click", () => goStore(b.dataset.store)));
+}
+
+async function submitSignup(ev) {
+  ev.preventDefault();
+  showErr("signupError", "");
+  const body = {
+    p_business_name: $("suBiz").value.trim(),
+    p_owner_name: $("suName").value.trim(),
+    p_pin: $("suPin").value.trim(),
+    p_whatsapp: $("suWhatsapp").value.trim(),
+  };
+  let r;
+  try { r = await rpc("signup_tenant", body); }
+  catch (e) { showErr("signupError", e.message); return; }
+  if (!r.ok) { showErr("signupError", r.message || "Could not create your store."); return; }
+  session = r; saveSession();
+  $("signupForm").classList.add("hidden");
+  $("hostBtn").classList.add("hidden");
+  const done = $("signupDone");
+  done.classList.remove("hidden");
+  done.innerHTML = `
+    <h3>Your store is open</h3>
+    <p>Your buyer shop link:<br><strong>${esc(location.origin + location.pathname + "?s=" + r.slug + "&shop")}</strong></p>
+    <p>Your recovery code — write it down now, it is shown only once:<br>
+       <span class="mono" style="font-size:20px">${esc(r.recovery_code || "")}</span></p>
+    <p class="tiny muted">Your store starts on a free 30-day trial. Add your first event, set your bank details in Settings, and share your shop link.</p>
+    <button type="button" class="btn primary big" id="suGo">Go to my store</button>`;
+  $("suGo").addEventListener("click", () => goStoreTeam(r.slug));
+}
+
 /* ---------------- buyer shop (public) ---------------- */
 let shopData = null;   // public_shop result
 let shopEvent = null;  // event the buyer picked
 
 function shopUrl() {
-  return location.origin + location.pathname + "?shop";
+  return location.origin + location.pathname + "?s=" + encodeURIComponent(ACTIVE_SLUG) + "&shop";
 }
 
 async function openShop() {
@@ -1125,7 +1237,7 @@ async function openShop() {
   $("shopForm").classList.add("hidden");
   $("shopDone").classList.add("hidden");
   try {
-    shopData = await rpc("public_shop", { p_slug: CFG.TENANT_SLUG });
+    shopData = await rpc("public_shop", { p_slug: ACTIVE_SLUG });
   } catch (e) {
     $("shopEvents").innerHTML = "<p class=\"error\">" + esc(e.message) + "</p>";
     return;
@@ -1134,6 +1246,7 @@ async function openShop() {
     $("shopEvents").innerHTML = "<p class=\"error\">" + esc(shopData.message || "Shop unavailable.") + "</p>";
     return;
   }
+  applySkin(shopData.theme || "fintech");
   $("shopBiz").textContent = shopData.business_name + " — Tickets";
   const evs = shopData.events || [];
   $("shopEvents").innerHTML = evs.length ? evs.map((e) => `
@@ -1309,7 +1422,7 @@ async function submitShopOrder(ev) {
   let r;
   try {
     r = await rpc("place_order", {
-      p_slug: CFG.TENANT_SLUG, p_event_id: shopEvent.id,
+      p_slug: ACTIVE_SLUG, p_event_id: shopEvent.id,
       p_lines: lines.map((l) => ({ type_id: l.type.id, qty: l.qty })),
       p_buyer_name: $("shopName").value.trim(), p_buyer_whatsapp: $("shopPhone").value.trim(),
       p_receipt_url: receiptUrl || null,
@@ -1411,10 +1524,16 @@ async function loadOrders() {
 document.addEventListener("DOMContentLoaded", () => {
   wire();
   loadSession();
+  if (session && session.tenant && session.tenant.slug && ACTIVE_SLUG && session.tenant.slug !== ACTIVE_SLUG) {
+    // A stored session belongs to one store only — never carry it into another.
+    session = null; saveSession();
+  }
   if (new URLSearchParams(location.search).has("shop")) {
     // A buyer link always opens the shop — even on a phone where a team
     // member happens to be signed in.
     openShop();
+  } else if (!ACTIVE_SLUG) {
+    openHome();
   } else if (session && session.token) {
     // Validate the stored session cheaply; enterApp's first RPC will bounce
     // to login if it has expired.
