@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Option I — Neon Fete</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space Grotesk:wght@500;700&family=Inter:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box} body{margin:0;background:#07030F;color:#F2EFFF;font-family:Inter,system-ui,sans-serif}
+.phone{max-width:430px;margin:0 auto;padding:22px 18px 40px;position:relative}
+.glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(255,46,136,.35),rgba(124,58,237,.18) 55%,transparent 70%);pointer-events:none}
+.top{display:flex;justify-content:space-between;align-items:center;position:relative}
+.brand{font-family:"Space Grotesk";font-weight:700;font-size:19px}
+.brand span{background:linear-gradient(90deg,#FF2E88,#00E0FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.opt{background:linear-gradient(90deg,#FF2E88,#7C3AED);color:#fff;border-radius:999px;padding:6px 12px;font-size:11.5px;font-weight:900;letter-spacing:.08em}
+.posterwrap{position:relative;margin-top:18px;border-radius:26px;padding:2px;background:linear-gradient(135deg,#FF2E88,#7C3AED,#00E0FF)}
+.posterwrap img{width:100%;display:block;border-radius:24px}
+h1{font-family:"Space Grotesk";font-weight:700;font-size:40px;line-height:1.02;margin:22px 0 6px}
+h1 span{background:linear-gradient(90deg,#FF2E88,#FF9E4F);-webkit-background-clip:text;background-clip:text;color:transparent}
+.meta{color:#B9AEDD;font-size:14.5px;line-height:1.55}
+.chips{display:flex;gap:8px;margin:16px 0 20px;flex-wrap:wrap}
+.chips span{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:700}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px);border-radius:24px;padding:6px 18px;margin-bottom:16px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid rgba(255,255,255,.09)}
+.row:last-child{border-bottom:none}
+.row b{font-size:16px}.row small{display:block;color:#B9AEDD;font-weight:600;margin-top:2px}
+.step{display:flex;align-items:center;gap:11px}
+.step button{width:37px;height:37px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:19px;font-weight:800}
+.step button.plus{background:linear-gradient(135deg,#FF2E88,#7C3AED);box-shadow:0 6px 18px rgba(255,46,136,.45)}
+.step .q{font-weight:800;min-width:18px;text-align:center}
+.sum{display:flex;justify-content:space-between;align-items:baseline}
+.sum span{color:#B9AEDD;font-weight:600}.sum b{font-family:"Space Grotesk";font-size:30px;background:linear-gradient(90deg,#FF2E88,#00E0FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.note{color:#B9AEDD;font-size:13px;line-height:1.55;margin:10px 0 0}
+.cta{display:block;width:100%;margin-top:18px;background:linear-gradient(90deg,#FF2E88,#7C3AED);color:#fff;border:none;border-radius:999px;padding:18px;font-size:17px;font-weight:800;box-shadow:0 16px 38px rgba(124,58,237,.5)}
+.foot{text-align:center;color:#6E639E;font-size:11.5px;margin-top:18px;letter-spacing:.16em;font-weight:700}
+</style></head><body><div class="phone"><div class="glow"></div>
+<div class="top"><div class="brand">TICKET<span>OFFICE</span></div><div class="opt">OPTION I</div></div>
+<div class="posterwrap"><img src="https://sjrubwotogjaxzeapndh.supabase.co/storage/v1/object/public/flyers/rhythm-reggae.jpg" alt="Rhythm and Reggae flyer"></div>
+<h1>Rhythm &amp; <span>Reggae</span></h1>
+<p class="meta">Saturday 28 Nov 2026 • 7:00 PM – 1:00 AM<br>Camp Ogden • R&amp;B and reggae fundraiser</p>
+<div class="chips"><span>General TT$100</span><span>VIP TT$300</span><span>Payment plans</span><span>Pay by transfer</span></div>
+<div class="card">
+  <div class="row"><div><b>General</b><small>TT$100</small></div><div class="step"><button>−</button><span class="q">2</span><button class="plus">+</button></div></div>
+  <div class="row"><div><b>VIP</b><small>TT$300</small></div><div class="step"><button>−</button><span class="q">0</span><button class="plus">+</button></div></div>
+  <div class="row"><div><b>Cooler fee</b><small>Add-on • TT$50</small></div><div class="step"><button>−</button><span class="q">1</span><button class="plus">+</button></div></div>
+</div>
+<div class="sum"><span>Total due</span><b>TT$250</b></div>
+<p class="note">Payment plan available — TT$75 holds your tickets today, the balance before the night.</p>
+<button class="cta">Place order — TT$250</button>
+<div class="foot">POWERED BY TICKET OFFICE</div>
+</div></body></html>
