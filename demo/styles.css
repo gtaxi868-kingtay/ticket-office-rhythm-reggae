@@ -343,3 +343,38 @@ html[data-theme="night"] .plan-note { background: #241B08; border-color: #4A3A12
    which left names white-on-white at night). */
 html[data-theme="night"] .member-card { background: #1D1116; }
 html[data-theme="night"] .member-card .role-pill { background: #2A161B; color: var(--text); }
+
+/* ---------- store skins (per-tenant themes) ---------- */
+html[data-skin="gold"]:not([data-theme="night"]) { --bg: #0A0806; --card: #14100B; --text: #F3EBDD; --muted: #B8A888; --border: #2C2417; --shadow: 0 12px 32px rgba(0,0,0,0.45); }
+html[data-skin="gold"] { --violet: #B97F22; --blue: #E9BC55; --grad: linear-gradient(135deg, #B97F22, #E9BC55); --radius: 20px; }
+html[data-skin="gold"]:not([data-theme="night"]) input,
+html[data-skin="gold"]:not([data-theme="night"]) select,
+html[data-skin="gold"]:not([data-theme="night"]) textarea { background: #1D1710; color: var(--text); border-color: var(--border); }
+html[data-skin="gold"]:not([data-theme="night"]) .member-card { background: #1D1710; }
+html[data-skin="gold"]:not([data-theme="night"]) .topbar { background: rgba(10, 8, 6, 0.92); }
+html[data-skin="pop"]:not([data-theme="night"]) { --bg: #FFF6EC; --card: #FFFFFF; --text: #17252B; --muted: #5A6B72; --border: #EBDCC4; --shadow: 6px 6px 0 rgba(23,37,43,0.10); }
+html[data-skin="pop"] { --violet: #0E7C86; --blue: #E85D1F; --grad: linear-gradient(135deg, #0E7C86, #E85D1F); --radius: 22px; }
+html[data-skin="sunset"]:not([data-theme="night"]) { --bg: #FFF3EE; --card: #FFFFFF; --text: #2A1A4A; --muted: #7A6A9A; --border: #F3D9CE; --shadow: 0 12px 32px rgba(42,26,74,0.10); }
+html[data-skin="sunset"] { --violet: #7B2FF7; --blue: #FF5E7E; --grad: linear-gradient(135deg, #FF5E7E, #FF9E4F); --radius: 28px; }
+html[data-skin="navy"]:not([data-theme="night"]) { --bg: #F7F3EA; --card: #FFFFFF; --text: #0F2B52; --muted: #5E6E8C; --border: #E3DCC8; --shadow: 0 12px 32px rgba(15,43,82,0.10); }
+html[data-skin="navy"] { --violet: #0F2B52; --blue: #C9A24B; --grad: linear-gradient(135deg, #0F2B52, #1E4E8C); --radius: 14px; }
+html[data-skin="mono"]:not([data-theme="night"]) { --bg: #F4F4F4; --card: #FFFFFF; --text: #111111; --muted: #6E6E6E; --border: #E2E2E2; --shadow: none; }
+html[data-skin="mono"] { --violet: #111111; --blue: #111111; --grad: linear-gradient(135deg, #111111, #111111); --radius: 10px; }
+
+/* theme picker (Settings) */
+.theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.theme-card { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 12px; cursor: pointer; text-align: left; font: inherit; }
+.theme-card.current { border-color: var(--violet); }
+.theme-dots { display: flex; gap: 5px; }
+.theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14); }
+.theme-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.theme-cur { font-size: 11px; font-weight: 800; color: var(--violet); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ---------- public home (events directory) ---------- */
+.home-wrap { width: 100%; max-width: 560px; margin: 0 auto; }
+.home-wrap .brand-mark { margin-top: 6px; }
+.host-card { margin-top: 22px; }
+.price-pill { display: inline-block; background: var(--grad); color: #fff; font-weight: 800; font-size: 12.5px; border-radius: 999px; padding: 3px 10px; margin-left: 8px; vertical-align: middle; }
+#homeEvents .event-card { margin-bottom: 16px; }
+#signupForm { margin-top: 14px; text-align: left; }
+#signupDone { text-align: left; margin-top: 12px; }

@@ -17,11 +17,35 @@
 <script src="vendor/qrcode.min.js"></script>
 <script src="vendor/jsQR.min.js"></script>
 <script src="config.js"></script>
-<script>try { document.documentElement.dataset.theme = localStorage.getItem("to_theme") || "day"; } catch (e) {}</script>
+<script>try { document.documentElement.dataset.theme = localStorage.getItem("to_theme") || "day"; document.documentElement.dataset.skin = localStorage.getItem("to_skin") || "fintech"; } catch (e) {}</script>
 </head>
 <body>
 
 <!-- ===================== LOGIN / SETUP ===================== -->
+<section id="homeScreen" class="login-wrap hidden">
+  <div class="home-wrap">
+    <div class="brand-mark"></div>
+    <h1 style="text-align:center">Ticket Office</h1>
+    <p class="muted" style="text-align:center">Events on sale now — tap one to get your tickets.</p>
+    <div id="homeEvents"></div>
+    <div class="card host-card">
+      <h2>Hosting an event?</h2>
+      <p class="muted">Open your own ticket store in about a minute: your own shop link, your own team, your money paid straight to your bank. Free for your first 30 days.</p>
+      <button id="hostBtn" type="button" class="btn primary">Open my ticket store</button>
+      <form id="signupForm" class="hidden">
+        <label>Business / organiser name<input id="suBiz" placeholder="e.g. Island Lime Promotions"></label>
+        <label>Your name<input id="suName" autocomplete="name" placeholder="Full name"></label>
+        <label>Your WhatsApp number<input id="suWhatsapp" type="tel" placeholder="1868..."></label>
+        <label>Choose a PIN (4–6 digits) — you sign in with it<input id="suPin" type="password" inputmode="numeric" maxlength="6"></label>
+        <p id="signupError" class="error hidden"></p>
+        <button type="submit" class="btn primary big">Create my store</button>
+      </form>
+      <div id="signupDone" class="hidden"></div>
+    </div>
+    <p class="tiny muted" style="text-align:center;margin-top:14px">Powered by Ticket Office</p>
+  </div>
+</section>
+
 <section id="loginScreen" class="login-wrap">
   <div class="login-card">
     <div class="brand-mark" aria-hidden="true"></div>
@@ -306,6 +330,11 @@
         <p class="tiny muted">Buyer shop link — send this to buyers:<br>
           <span id="shopLink"></span>
           <button id="shopLinkCopy" type="button" class="btn small">Copy link</button></p>
+      </div>
+      <div class="card">
+        <h2>Shop theme</h2>
+        <p class="tiny muted">Your store's look. Buyers see it in your shop, your team sees it in the app. Night mode still works over every theme.</p>
+        <div id="themeGrid" class="theme-grid"></div>
       </div>
       <div class="card">
         <h2>Team</h2>
