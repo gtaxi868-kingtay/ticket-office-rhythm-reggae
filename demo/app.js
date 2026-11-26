@@ -1124,6 +1124,7 @@ function toggleTheme() {
 
 /* ---------------- store skins (per-tenant theme — "the mall") ---------------- */
 const SKINS = [
+  { key: "premiere", name: "Premiere Gold", dots: ["#E9BC55", "#060505", "#F5EFE6"] },
   { key: "fintech", name: "Clean Fintech", dots: ["#7C3AED", "#3B82F6", "#F6F7FB"] },
   { key: "gold", name: "Midnight Gold", dots: ["#D9A441", "#0A0806", "#F3EBDD"] },
   { key: "pop", name: "Poster Pop", dots: ["#0E7C86", "#E85D1F", "#F2B035"] },
@@ -1169,6 +1170,7 @@ async function openHome() {
   $("app").classList.add("hidden");
   $("shopScreen").classList.add("hidden");
   $("homeScreen").classList.remove("hidden");
+  applySkin("premiere");
   $("homeEvents").innerHTML = "<p class='muted'>Loading events…</p>";
   let r;
   try { r = await rpc("public_events", {}); }
@@ -1183,7 +1185,7 @@ async function openHome() {
       ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
       <div class="event-meta">
         <strong>${esc(e.name)}</strong><br>
-        ${esc(fmtDate(e.event_date))} • ${esc(e.start_time || "")} • ${esc(e.venue || "")}<br>
+        ${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}<br>
         <span class="tiny muted">by ${esc(e.business_name)}</span>
         ${e.from_price != null ? `<span class="price-pill">from ${money(e.from_price)}</span>` : ""}
       </div>
@@ -1254,7 +1256,7 @@ async function openShop() {
       ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
       <div class="event-meta">
         <strong>${esc(e.name)}</strong><br>
-        ${esc(fmtDate(e.event_date))} • ${esc(e.start_time || "")} • ${esc(e.venue || "")}<br>
+        ${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}<br>
         ${(e.types || []).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}
       </div>
       <button type="button" class="btn primary" data-shop-ev="${e.id}">Order tickets</button>
