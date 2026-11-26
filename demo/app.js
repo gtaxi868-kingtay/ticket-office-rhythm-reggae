@@ -1124,6 +1124,7 @@ function toggleTheme() {
 
 /* ---------------- store skins (per-tenant theme — "the mall") ---------------- */
 const SKINS = [
+  { key: "noir", name: "Noir Glass", dots: ["#FFFFFF", "#0B0B0F", "#FF5A36"] },
   { key: "premiere", name: "Premiere Gold", dots: ["#E9BC55", "#060505", "#F5EFE6"] },
   { key: "fintech", name: "Clean Fintech", dots: ["#7C3AED", "#3B82F6", "#F6F7FB"] },
   { key: "gold", name: "Midnight Gold", dots: ["#D9A441", "#0A0806", "#F3EBDD"] },
@@ -1170,7 +1171,7 @@ async function openHome() {
   $("app").classList.add("hidden");
   $("shopScreen").classList.add("hidden");
   $("homeScreen").classList.remove("hidden");
-  applySkin("premiere");
+  applySkin("noir");
   $("homeEvents").innerHTML = "<p class='muted'>Loading events…</p>";
   let r;
   try { r = await rpc("public_events", {}); }
@@ -1187,6 +1188,7 @@ async function openHome() {
         <div class="kicker">by ${esc(e.business_name)}</div>
         <div class="dir-name">${esc(e.name)}</div>
         <div class="dir-meta">${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}</div>
+        <div class="perf"></div>
         ${e.from_price != null ? `<div class="dir-price">Tickets from <strong>${money(e.from_price)}</strong></div>` : ""}
         <button type="button" class="btn primary big" data-store="${esc(e.slug)}">Get tickets</button>
       </div>
@@ -1257,6 +1259,7 @@ async function openShop() {
       <div class="dir-body">
         <div class="dir-name">${esc(e.name)}</div>
         <div class="dir-meta">${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}</div>
+        <div class="perf"></div>
         <div class="dir-types">${(e.types || []).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}</div>
         <button type="button" class="btn primary big" data-shop-ev="${e.id}">Order tickets</button>
       </div>
@@ -1357,6 +1360,8 @@ function updateShopSummary() {
     }
   }
   $("shopSummary").innerHTML = html;
+  const submitBtn = document.querySelector("#shopForm button[type=submit]");
+  if (submitBtn) submitBtn.textContent = lines.length ? "Place order \u2022 " + money(total) : "Place order";
 }
 
 /* Add-to-calendar (.ics) built locally — event times are free text like
