@@ -415,3 +415,48 @@ html[data-skin="premiere"]:not([data-theme="night"]) .topbar { background: rgba(
 .summary-box .total-row { font-size: 17px; }
 html[data-skin="premiere"] .dir-name { font-family: "Fraunces", Georgia, serif; font-weight: 900; }
 html[data-skin="premiere"] .glass-chips span { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); }
+
+/* ---------- NOIR GLASS (flagship — ambient dark glass) ---------- */
+.perf { display: none; }
+html[data-skin="noir"] {
+  --bg: #0B0B0F; --card: #17171E; --panel: #121218; --text: #FFFFFF;
+  --muted: rgba(255,255,255,0.62); --border: rgba(255,255,255,0.11);
+  --blue: #FFFFFF; --violet: #FF5A36; --field: rgba(255,255,255,0.07);
+}
+html[data-skin="noir"]:not([data-theme="night"]) body {
+  background:
+    radial-gradient(560px 380px at 10% -60px, rgba(255,64,32,0.20), transparent 65%),
+    radial-gradient(640px 420px at 96% 16%, rgba(70,36,150,0.22), transparent 65%),
+    radial-gradient(720px 520px at 50% 110%, rgba(255,150,40,0.13), transparent 65%),
+    var(--bg);
+  background-attachment: fixed;
+}
+html[data-skin="noir"]:not([data-theme="night"]) .card,
+html[data-skin="noir"]:not([data-theme="night"]) .event-card,
+html[data-skin="noir"]:not([data-theme="night"]) .member-card,
+html[data-skin="noir"]:not([data-theme="night"]) .hero-card,
+html[data-skin="noir"]:not([data-theme="night"]) .modal-card {
+  background: rgba(255,255,255,0.055);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border-color: rgba(255,255,255,0.10);
+  border-radius: 26px;
+}
+html[data-skin="noir"] h1, html[data-skin="noir"] h2,
+html[data-skin="noir"] .dir-name, html[data-skin="noir"] .ticket-stub > div:first-of-type {
+  font-family: "Baloo 2", "Plus Jakarta Sans", sans-serif; font-weight: 800; letter-spacing: 0.01em;
+}
+html[data-skin="noir"] .btn { border-radius: 999px; }
+html[data-skin="noir"] .btn.primary { background: #FFFFFF; color: #0B0B0F; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+html[data-skin="noir"] .kicker { color: rgba(255,255,255,0.55); }
+html[data-skin="noir"] .glass-chips span { background: rgba(255,255,255,0.07); backdrop-filter: blur(10px); border-color: rgba(255,255,255,0.15); color: #fff; }
+html[data-skin="noir"] .perf { display: block; position: relative; border-top: 2px dashed rgba(255,255,255,0.16); margin: 15px 0 13px; }
+html[data-skin="noir"] .perf::before, html[data-skin="noir"] .perf::after {
+  content: ""; position: absolute; top: -12px; width: 24px; height: 24px; border-radius: 50%; background: #0B0B0F;
+}
+html[data-skin="noir"] .perf::before { left: -30px; }
+html[data-skin="noir"] .perf::after { right: -30px; }
+html[data-skin="noir"] #shopForm button[type="submit"] { position: sticky; bottom: 14px; z-index: 5; }
+html[data-skin="noir"] .ticket-stub > div:first-of-type { font-size: 23px !important; }
+html[data-skin="noir"] .stepper button { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.14); }
+html[data-skin="noir"] .theme-toggle { background: rgba(255,255,255,0.08); color: #fff; }
