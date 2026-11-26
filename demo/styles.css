@@ -426,17 +426,16 @@ html[data-skin="noir"] {
 html[data-skin="noir"] body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(900px 480px at 50% -120px, rgba(255,72,36,0.44), transparent 62%),
-    radial-gradient(760px 560px at 88% 30%, rgba(96,52,200,0.42), transparent 62%),
-    radial-gradient(820px 620px at 8% 62%, rgba(255,150,40,0.32), transparent 62%),
-    radial-gradient(900px 700px at 50% 115%, rgba(200,32,80,0.30), transparent 62%);
+    radial-gradient(700px 420px at 50% 6%, rgba(255,72,36,0.52), transparent 65%),
+    radial-gradient(720px 520px at 50% 46%, rgba(96,52,200,0.48), transparent 65%),
+    radial-gradient(760px 560px at 50% 88%, rgba(255,150,40,0.38), transparent 65%);
 }
 html[data-skin="noir"] .card,
 html[data-skin="noir"] .event-card,
 html[data-skin="noir"] .member-card,
 html[data-skin="noir"] .hero-card,
 html[data-skin="noir"] .modal-card {
-  background: rgba(255,255,255,0.09);
+  background: linear-gradient(165deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05));
   backdrop-filter: blur(22px) saturate(1.6);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
   border-color: rgba(255,255,255,0.13);
@@ -468,6 +467,6 @@ html[data-skin="noir"] .theme-toggle { background: rgba(255,255,255,0.08); color
 .host-name { font-weight: 700; font-size: 13.5px; }
 .host-sold { color: var(--muted); font-size: 12.5px; font-weight: 600; }
 html[data-skin="noir"] .host-avatar { background: linear-gradient(135deg, #FF5A36, #8B3DFF); }
-html[data-skin="noir"] .shop-hero { background: rgba(255,255,255,0.07); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 26px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 40px rgba(0,0,0,0.45); }
+html[data-skin="noir"] .shop-hero { background: linear-gradient(165deg, rgba(255,255,255,0.13), rgba(255,255,255,0.05)); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 26px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 40px rgba(0,0,0,0.45); }
 html[data-skin="noir"] .shop-hero-img { border-radius: 0; }
 html[data-skin="noir"] .shop-hero-body { padding: 18px 18px 20px; }
