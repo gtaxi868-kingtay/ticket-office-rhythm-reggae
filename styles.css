@@ -431,6 +431,7 @@ html[data-skin="noir"] body::before {
     radial-gradient(760px 560px at 50% 88%, rgba(255,150,40,0.38), transparent 65%);
 }
 html[data-skin="noir"] .card,
+html[data-skin="noir"] .login-card,
 html[data-skin="noir"] .event-card,
 html[data-skin="noir"] .member-card,
 html[data-skin="noir"] .hero-card,
