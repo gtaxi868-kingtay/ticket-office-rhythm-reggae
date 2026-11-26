@@ -1181,15 +1181,15 @@ async function openHome() {
     return;
   }
   $("homeEvents").innerHTML = evs.map((e) => `
-    <div class="event-card">
+    <div class="event-card dir-card">
       ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
-      <div class="event-meta">
-        <strong>${esc(e.name)}</strong><br>
-        ${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}<br>
-        <span class="tiny muted">by ${esc(e.business_name)}</span>
-        ${e.from_price != null ? `<span class="price-pill">from ${money(e.from_price)}</span>` : ""}
+      <div class="dir-body">
+        <div class="kicker">by ${esc(e.business_name)}</div>
+        <div class="dir-name">${esc(e.name)}</div>
+        <div class="dir-meta">${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}</div>
+        ${e.from_price != null ? `<div class="dir-price">Tickets from <strong>${money(e.from_price)}</strong></div>` : ""}
+        <button type="button" class="btn primary big" data-store="${esc(e.slug)}">Get tickets</button>
       </div>
-      <button type="button" class="btn primary" data-store="${esc(e.slug)}">Get tickets</button>
     </div>`).join("");
   $("homeEvents").querySelectorAll("[data-store]").forEach((b) =>
     b.addEventListener("click", () => goStore(b.dataset.store)));
@@ -1252,14 +1252,14 @@ async function openShop() {
   $("shopBiz").textContent = shopData.business_name + " — Tickets";
   const evs = shopData.events || [];
   $("shopEvents").innerHTML = evs.length ? evs.map((e) => `
-    <div class="event-card">
+    <div class="event-card dir-card">
       ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
-      <div class="event-meta">
-        <strong>${esc(e.name)}</strong><br>
-        ${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}<br>
-        ${(e.types || []).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}
+      <div class="dir-body">
+        <div class="dir-name">${esc(e.name)}</div>
+        <div class="dir-meta">${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}</div>
+        <div class="dir-types">${(e.types || []).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}</div>
+        <button type="button" class="btn primary big" data-shop-ev="${e.id}">Order tickets</button>
       </div>
-      <button type="button" class="btn primary" data-shop-ev="${e.id}">Order tickets</button>
     </div>`).join("")
     : "<p class=\"muted\">No events are on sale right now.</p>";
   $("shopEvents").querySelectorAll("[data-shop-ev]").forEach((b) =>
@@ -1275,7 +1275,19 @@ function selectShopEvent(id) {
   shopEvent = (shopData.events || []).find((e) => e.id === id);
   if (!shopEvent) return;
   shopCart = {};
-  $("shopFormTitle").textContent = "Order — " + shopEvent.name;
+  $("shopFormTitle").textContent = "Your order";
+  const hero = $("shopHero");
+  if (hero) {
+    hero.classList.remove("hidden");
+    const img = $("shopHeroImg");
+    if (shopEvent.flyer_url) { img.src = shopEvent.flyer_url; img.alt = shopEvent.name + " flyer"; img.classList.remove("hidden"); }
+    else img.classList.add("hidden");
+    $("shopHeroKicker").textContent = (shopData.business_name || "") + " presents";
+    $("shopHeroName").textContent = shopEvent.name;
+    $("shopHeroMeta").textContent = [fmtDate(shopEvent.event_date), shopEvent.start_time, shopEvent.venue].filter(Boolean).join(" • ");
+    $("shopHeroChips").innerHTML = (shopEvent.types || []).filter((t) => !t.is_addon)
+      .map((t) => `<span>${esc(t.name)} — ${money(t.price)}</span>`).join("");
+  }
   renderShopTypes();
   renderShopQuestions();
   $("shopForm").classList.remove("hidden");
