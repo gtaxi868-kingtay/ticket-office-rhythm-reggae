@@ -1182,15 +1182,20 @@ async function openHome() {
     return;
   }
   $("homeEvents").innerHTML = evs.map((e) => `
-    <div class="event-card dir-card">
-      ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
-      <div class="dir-body">
-        <div class="kicker">by ${esc(e.business_name)}</div>
-        <div class="dir-name">${esc(e.name)}</div>
-        <div class="dir-meta">${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}</div>
-        <div class="perf"></div>
-        ${e.from_price != null ? `<div class="dir-price">Tickets from <strong>${money(e.from_price)}</strong></div>` : ""}
-        <button type="button" class="btn primary big" data-store="${esc(e.slug)}">Get tickets</button>
+    <div class="event-card ticket-row" data-store="${esc(e.slug)}" role="button" tabindex="0" aria-label="Get tickets for ${esc(e.name)}">
+      <div class="t-top">
+        ${e.flyer_url ? `<img class="t-thumb" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
+        <div class="t-main">
+          <div class="t-date">${esc([fmtDate(e.event_date), e.start_time].filter(Boolean).join(" • "))}</div>
+          <div class="t-name">${esc(e.name)}</div>
+          <div class="t-by">by ${esc(e.business_name)}</div>
+        </div>
+        <span class="t-arrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="perf"></div>
+      <div class="t-strip">
+        <span class="t-venue"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><span>${esc(e.venue || "")}</span></span>
+        ${e.from_price != null ? `<span class="t-price">from ${money(e.from_price)}</span>` : ""}
       </div>
     </div>`).join("");
   $("homeEvents").querySelectorAll("[data-store]").forEach((b) =>
@@ -1254,14 +1259,20 @@ async function openShop() {
   $("shopBiz").textContent = shopData.business_name + " — Tickets";
   const evs = shopData.events || [];
   $("shopEvents").innerHTML = evs.length ? evs.map((e) => `
-    <div class="event-card dir-card">
-      ${e.flyer_url ? `<img class="poster" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
-      <div class="dir-body">
-        <div class="dir-name">${esc(e.name)}</div>
-        <div class="dir-meta">${esc([fmtDate(e.event_date), e.start_time, e.venue].filter(Boolean).join(" • "))}</div>
-        <div class="perf"></div>
-        <div class="dir-types">${(e.types || []).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}</div>
-        <button type="button" class="btn primary big" data-shop-ev="${e.id}">Order tickets</button>
+    <div class="event-card ticket-row" data-shop-ev="${e.id}" role="button" tabindex="0" aria-label="Order tickets for ${esc(e.name)}">
+      <div class="t-top">
+        ${e.flyer_url ? `<img class="t-thumb" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
+        <div class="t-main">
+          <div class="t-date">${esc([fmtDate(e.event_date), e.start_time].filter(Boolean).join(" • "))}</div>
+          <div class="t-name">${esc(e.name)}</div>
+          <div class="t-by">${(e.types || []).filter((t) => !t.is_addon).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}</div>
+        </div>
+        <span class="t-arrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="perf"></div>
+      <div class="t-strip">
+        <span class="t-venue"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><span>${esc(e.venue || "")}</span></span>
+        <span class="t-price">Order tickets</span>
       </div>
     </div>`).join("")
     : "<p class=\"muted\">No events are on sale right now.</p>";
