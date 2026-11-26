@@ -1288,6 +1288,9 @@ function selectShopEvent(id) {
     $("shopHeroKicker").textContent = (shopData.business_name || "") + " presents";
     $("shopHeroName").textContent = shopEvent.name;
     $("shopHeroMeta").textContent = [fmtDate(shopEvent.event_date), shopEvent.start_time, shopEvent.venue].filter(Boolean).join(" • ");
+    $("shopHeroAvatar").textContent = (shopData.business_name || "T").trim().charAt(0).toUpperCase();
+    $("shopHeroHost").textContent = "Hosted by " + (shopData.business_name || "");
+    $("shopHeroSold").textContent = shopEvent.sold > 0 ? shopEvent.sold + (shopEvent.sold === 1 ? " ticket sold" : " tickets sold") : "";
     $("shopHeroChips").innerHTML = (shopEvent.types || []).filter((t) => !t.is_addon)
       .map((t) => `<span>${esc(t.name)} — ${money(t.price)}</span>`).join("");
   }
