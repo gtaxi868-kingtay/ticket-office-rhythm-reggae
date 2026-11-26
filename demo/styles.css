@@ -378,3 +378,15 @@ html[data-skin="mono"] { --violet: #111111; --blue: #111111; --grad: linear-grad
 #homeEvents .event-card { margin-bottom: 16px; }
 #signupForm { margin-top: 14px; text-align: left; }
 #signupDone { text-align: left; margin-top: 12px; }
+
+/* ---------- Premiere Gold (the flagship skin) ---------- */
+html[data-skin="premiere"]:not([data-theme="night"]) { --bg: #060505; --card: #100D0A; --text: #F5EFE6; --muted: #B8A888; --border: #2C2417; --shadow: 0 16px 40px rgba(0,0,0,0.5); }
+html[data-skin="premiere"] { --violet: #B97F22; --blue: #E9BC55; --grad: linear-gradient(135deg, #B97F22, #E9BC55); --radius: 22px; }
+html[data-skin="premiere"] h1, html[data-skin="premiere"] h2 { font-family: "Fraunces", Georgia, "Times New Roman", serif; letter-spacing: 0.01em; }
+html[data-skin="premiere"]:not([data-theme="night"]) input,
+html[data-skin="premiere"]:not([data-theme="night"]) select,
+html[data-skin="premiere"]:not([data-theme="night"]) textarea { background: #1A1409; color: var(--text); border-color: var(--border); }
+html[data-skin="premiere"]:not([data-theme="night"]) .member-card { background: #1A1409; }
+html[data-skin="premiere"]:not([data-theme="night"]) .topbar { background: rgba(6, 5, 5, 0.92); }
+html[data-skin="premiere"] .event-card img.poster,
+html[data-skin="premiere"] .hero-card img.poster { -webkit-mask-image: linear-gradient(180deg, #000 84%, transparent 99%); mask-image: linear-gradient(180deg, #000 84%, transparent 99%); }
