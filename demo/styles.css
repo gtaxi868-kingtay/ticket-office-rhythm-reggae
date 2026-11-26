@@ -389,3 +389,29 @@ html[data-skin="premiere"]:not([data-theme="night"]) textarea { background: #1A1
 html[data-skin="premiere"]:not([data-theme="night"]) .member-card { background: #1A1409; }
 html[data-skin="premiere"]:not([data-theme="night"]) .topbar { background: rgba(6, 5, 5, 0.92); }
 /* Premiere keeps flyers fully visible — Taylor's rule: a flyer is never cropped or dimmed. */
+
+/* ---------- editorial structure (home + shop) ---------- */
+.kicker { letter-spacing: 0.22em; text-transform: uppercase; font-size: 11.5px; font-weight: 800; color: var(--blue); }
+.dir-card { padding: 0; overflow: hidden; }
+.dir-card img.poster { border-radius: 0; margin-bottom: 0; }
+.dir-body { padding: 16px 18px 18px; }
+.dir-name { font-size: 25px; font-weight: 800; line-height: 1.08; margin: 3px 0 5px; }
+.dir-meta { color: var(--muted); font-size: 14px; font-weight: 600; }
+.dir-types { margin-top: 7px; font-size: 14px; font-weight: 600; }
+.dir-price { margin-top: 9px; font-size: 14.5px; color: var(--muted); }
+.dir-price strong { color: var(--text); font-size: 17px; }
+.dir-body .btn { width: 100%; margin-top: 14px; }
+.shop-hero { margin: 2px 0 20px; text-align: left; }
+.shop-hero-img { width: 100%; height: auto; display: block; border-radius: 20px; }
+.shop-hero-body { padding: 16px 2px 0; }
+.shop-hero-name { font-size: 36px; line-height: 1.0; margin: 5px 0 6px; }
+.shop-hero-meta { color: var(--muted); font-size: 14.5px; font-weight: 600; margin: 0; }
+.glass-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 13px; }
+.glass-chips span { border: 1px solid var(--border); background: var(--card); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 700; }
+#shopForm h3 { letter-spacing: 0.14em; text-transform: uppercase; font-size: 12px; color: var(--muted); }
+#shopFormTitle { font-size: 21px; }
+.type-row { padding: 15px 2px; }
+.summary-box { border-top: 1.5px dashed var(--border); border-radius: 0; background: transparent; padding: 14px 2px 4px; }
+.summary-box .total-row { font-size: 17px; }
+html[data-skin="premiere"] .dir-name { font-family: "Fraunces", Georgia, serif; font-weight: 900; }
+html[data-skin="premiere"] .glass-chips span { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); }
