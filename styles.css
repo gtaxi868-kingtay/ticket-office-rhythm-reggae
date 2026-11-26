@@ -423,18 +423,18 @@ html[data-skin="noir"] {
   --muted: rgba(255,255,255,0.62); --border: rgba(255,255,255,0.11);
   --blue: #FFFFFF; --violet: #FF5A36; --field: rgba(255,255,255,0.07);
 }
-html[data-skin="noir"]:not([data-theme="night"]) body::before {
+html[data-skin="noir"] body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
     radial-gradient(560px 380px at 10% -40px, rgba(255,64,32,0.36), transparent 65%),
     radial-gradient(640px 420px at 96% 14%, rgba(84,42,180,0.36), transparent 65%),
     radial-gradient(720px 520px at 50% 108%, rgba(255,150,40,0.24), transparent 65%);
 }
-html[data-skin="noir"]:not([data-theme="night"]) .card,
-html[data-skin="noir"]:not([data-theme="night"]) .event-card,
-html[data-skin="noir"]:not([data-theme="night"]) .member-card,
-html[data-skin="noir"]:not([data-theme="night"]) .hero-card,
-html[data-skin="noir"]:not([data-theme="night"]) .modal-card {
+html[data-skin="noir"] .card,
+html[data-skin="noir"] .event-card,
+html[data-skin="noir"] .member-card,
+html[data-skin="noir"] .hero-card,
+html[data-skin="noir"] .modal-card {
   background: rgba(255,255,255,0.055);
   backdrop-filter: blur(18px) saturate(1.5);
   -webkit-backdrop-filter: blur(18px) saturate(1.5);
