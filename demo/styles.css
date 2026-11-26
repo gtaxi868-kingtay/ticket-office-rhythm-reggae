@@ -388,5 +388,4 @@ html[data-skin="premiere"]:not([data-theme="night"]) select,
 html[data-skin="premiere"]:not([data-theme="night"]) textarea { background: #1A1409; color: var(--text); border-color: var(--border); }
 html[data-skin="premiere"]:not([data-theme="night"]) .member-card { background: #1A1409; }
 html[data-skin="premiere"]:not([data-theme="night"]) .topbar { background: rgba(6, 5, 5, 0.92); }
-html[data-skin="premiere"] .event-card img.poster,
-html[data-skin="premiere"] .hero-card img.poster { -webkit-mask-image: linear-gradient(180deg, #000 84%, transparent 99%); mask-image: linear-gradient(180deg, #000 84%, transparent 99%); }
+/* Premiere keeps flyers fully visible — Taylor's rule: a flyer is never cropped or dimmed. */
