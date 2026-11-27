@@ -512,3 +512,13 @@ html[data-skin="noir"] .ticket-row .perf::before { left: -8px; }
 html[data-skin="noir"] .ticket-row .perf::after { right: -8px; }
 #homeScreen .home-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
 html[data-skin="noir"] #shopScreen .login-card { background: linear-gradient(165deg, rgba(255,90,50,0.16), rgba(120,60,220,0.12) 55%, rgba(255,160,60,0.08)); background-color: rgba(10,10,15,0.35); }
+
+/* ---------- v36: true small notches + floating pill buy bar ---------- */
+.ticket-row .perf::before, .ticket-row .perf::after { width: 14px; height: 14px; top: -8px; }
+.ticket-row .perf::before { left: -7px; }
+.ticket-row .perf::after { right: -7px; }
+html[data-skin="noir"] .ticket-row .perf::before, html[data-skin="noir"] .ticket-row .perf::after { width: 14px; height: 14px; top: -8px; }
+html[data-skin="noir"] .ticket-row .perf::before { left: -7px; }
+html[data-skin="noir"] .ticket-row .perf::after { right: -7px; }
+html[data-skin="noir"] body.shop-open #shopBuyBar { left: 14px; right: 14px; bottom: calc(12px + var(--safe-bottom)); border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); padding: 8px; }
+html[data-skin="noir"] body.shop-open #shopBuyBar .btn { border-radius: 999px; }
