@@ -1,6 +1,9 @@
-/* Ticket Office — Upwise-style light UI.
-   Off-white background, white rounded cards, soft shadows, violet→blue
-   gradient primary actions, one rounded-stroke SVG icon family. */
+/* Ticket Office — one design system.
+   Structure and spacing follow the laws: Jakob (familiar patterns),
+   Hick (few choices per screen), 60-30-10 colour balance, Von Restorff
+   (one element shouts per screen), figure-ground (glass over glow).
+   The flagship skin is Noir Glass: ambient glow, frosted panels,
+   chunky rounded display type, white pill actions, ticket-shaped cards. */
 :root {
   --bg: #F6F7FB;
   --card: #FFFFFF;
@@ -24,6 +27,7 @@ body {
   font-family: "Plus Jakarta Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg); color: var(--text);
   padding-bottom: calc(24px + var(--safe-bottom));
+  line-height: 1.45;
 }
 .hidden { display: none !important; }
 .muted { color: var(--muted); }
@@ -31,10 +35,10 @@ body {
 .center { text-align: center; }
 .error { color: var(--bad); font-weight: 600; }
 .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 1px; }
-h1 { font-size: 26px; margin: 10px 0 2px; }
-h2 { font-size: 20px; margin: 6px 0 10px; }
-h3 { font-size: 16px; margin: 12px 0 8px; }
-.section-title { margin: 20px 4px 10px; }
+h1 { font-size: 27px; margin: 10px 0 4px; line-height: 1.12; }
+h2 { font-size: 21px; margin: 6px 0 10px; line-height: 1.15; }
+h3 { font-size: 16px; margin: 14px 0 8px; }
+.section-title { margin: 22px 4px 10px; }
 
 /* one rounded-stroke icon family (inline SVG) */
 .ic { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -54,7 +58,7 @@ h3 { font-size: 16px; margin: 12px 0 8px; }
 .brand-mark.small { width: 40px; height: 40px; border-radius: 13px; margin: 0; }
 .brand-mark.small::after { inset: 10px 8px; border-radius: 5px; }
 
-/* ---------- login ---------- */
+/* ---------- login (Jakob: the sign-in everyone already knows) ---------- */
 .login-wrap { min-height: 100dvh; display: flex; align-items: flex-start; justify-content: center; padding: calc(28px + var(--safe-top)) 16px 24px; }
 .login-card { background: var(--card); border-radius: 30px; box-shadow: var(--shadow); padding: 28px 22px; width: 100%; max-width: 420px; text-align: center; }
 .login-card form { text-align: left; }
@@ -72,9 +76,7 @@ h3 { font-size: 16px; margin: 12px 0 8px; }
 .role-pill { margin-left: auto; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; padding: 4px 9px; border-radius: 999px; background: #EEF2FF; color: var(--violet); }
 .role-pill.door { background: #ECFDF5; color: var(--good); }
 .role-pill.seller { background: #FFF7ED; color: #C05621; }
-.pin-input {
-  text-align: center; font-size: 30px; letter-spacing: 10px; font-weight: 800;
-}
+.pin-input { text-align: center; font-size: 30px; letter-spacing: 10px; font-weight: 800; }
 .recovery-code {
   font-family: ui-monospace, Menlo, monospace; font-size: 26px; font-weight: 800; letter-spacing: 2px;
   background: #FFFBEB; border: 1.5px dashed var(--warn); border-radius: 16px; padding: 16px; margin: 12px 0;
@@ -105,9 +107,9 @@ main { padding: 6px 16px 0; max-width: 560px; margin: 0 auto; }
 label { display: block; font-size: 13.5px; font-weight: 700; color: var(--muted); margin: 12px 0 6px; }
 input, select, textarea {
   width: 100%; padding: 13px 14px; font-size: 16px; color: var(--text);
-  background: #FBFBFE; border: 1.5px solid var(--border); border-radius: 14px; outline: none;
+  background: #FBFBFE; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit;
 }
-input:focus, select:focus { border-color: var(--violet); }
+input:focus, select:focus, textarea:focus { border-color: var(--violet); }
 .btn {
   border: none; border-radius: 16px; padding: 12px 18px; font-size: 15.5px; font-weight: 700;
   background: #EEF2FF; color: var(--violet); cursor: pointer; margin: 8px 0;
@@ -119,9 +121,17 @@ input:focus, select:focus { border-color: var(--violet); }
 .btn.linklike { background: transparent; color: var(--violet); width: 100%; font-weight: 600; }
 .btn:active { transform: scale(0.99); }
 .btn[disabled] { opacity: 0.55; pointer-events: none; }
-.stepper { display: flex; align-items: center; gap: 18px; }
+.stepper { display: flex; align-items: center; gap: 10px; }
 .stepper button { width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--card); font-size: 24px; font-weight: 700; color: var(--violet); cursor: pointer; }
 .stepper span { font-size: 22px; font-weight: 800; min-width: 28px; text-align: center; }
+.step-btn {
+  width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: #F1F4FA; color: var(--text); font-size: 20px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: transform .08s ease; flex: none;
+}
+.step-btn:active { transform: scale(.9); }
+.step-qty { min-width: 22px; text-align: center; font-weight: 800; font-size: 16px; }
 .total-line { margin: 10px 0; font-size: 16px; }
 .switch-row { display: flex; align-items: center; justify-content: space-between; font-size: 15px; color: var(--text); }
 .switch-row input { display: none; }
@@ -148,8 +158,8 @@ input:focus, select:focus { border-color: var(--violet); }
 .dots span.on { background: var(--violet); width: 22px; border-radius: 999px; }
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .stat { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); padding: 16px; }
-.stat .num { font-size: 24px; font-weight: 800; }
-.stat .lbl { color: var(--muted); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat .num { font-size: 25px; font-weight: 800; line-height: 1.1; }
+.stat .lbl { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 3px; }
 .bar { height: 10px; border-radius: 999px; background: #E9EDF9; overflow: hidden; margin: 8px 0 4px; }
 .bar > div { height: 100%; background: var(--grad); border-radius: 999px; }
 .stack { display: flex; height: 14px; border-radius: 999px; overflow: hidden; margin: 8px 0; }
@@ -158,7 +168,7 @@ input:focus, select:focus { border-color: var(--violet); }
 .breakdown-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
 .breakdown-row:last-child { border-bottom: none; }
 
-/* ---------- tickets list ---------- */
+/* ---------- registry rows + status chips ---------- */
 .ticket-row { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 14px 16px; margin: 10px 0; }
 .ticket-row .code { font-weight: 800; font-size: 16px; }
 .chip { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 999px; margin-left: 6px; }
@@ -180,7 +190,7 @@ input:focus, select:focus { border-color: var(--violet); }
 .door-result.bad { background: #FEF2F2; color: var(--bad); border: 2px solid var(--bad); }
 .door-result .sub { display: block; font-size: 14px; font-weight: 600; margin-top: 6px; }
 
-/* ---------- sheet / modal / ticket ---------- */
+/* ---------- sheet / modal / the ticket itself ---------- */
 .sheet { position: fixed; inset: 0; z-index: 80; background: rgba(16, 20, 40, 0.45); display: flex; align-items: flex-end; justify-content: center; }
 .sheet-card { background: var(--card); width: 100%; max-width: 560px; border-radius: 28px 28px 0 0; padding: 20px 20px calc(16px + var(--safe-bottom)); }
 .sheet-card button { display: block; width: 100%; text-align: left; background: #FBFBFE; border: 1.5px solid var(--border); border-radius: 14px; padding: 14px; margin: 8px 0; font-size: 16px; font-weight: 700; color: var(--text); cursor: pointer; }
@@ -208,8 +218,7 @@ input:focus, select:focus { border-color: var(--violet); }
 }
 .audit-row { background: var(--card); border-radius: 16px; padding: 12px 14px; margin: 8px 0; box-shadow: var(--shadow); font-size: 14px; }
 .steps li { margin: 8px 0; line-height: 1.45; }
-.print-sheet { position: fixed; inset: 0; z-index: 200; background: #fff; color: #17203A;
-  overflow-y: auto; padding: 22px 18px 40px; }
+.print-sheet { position: fixed; inset: 0; z-index: 200; background: #fff; color: #17203A; overflow-y: auto; padding: 22px 18px 40px; }
 .print-sheet .breakdown-row { border-bottom: 1px solid #E3E8F4; }
 .print-close-top { position: sticky; top: 0; z-index: 5; display: inline-flex; align-items: center; gap: 6px;
   background: #fff; border: 1px solid #E3E8F4; color: #17203A; font: inherit; font-size: 14.5px; font-weight: 700;
@@ -221,25 +230,12 @@ input:focus, select:focus { border-color: var(--violet); }
   #printSheet { position: static !important; overflow: visible !important; padding: 0; }
 }
 
-/* Buyer shop + orders */
-.shop-entry { margin-top: 18px; text-align: left; }
-.bank-box { white-space: pre-wrap; word-break: break-word; background: #F2F5FB; border: 1px solid #E3E8F4;
-  border-radius: 14px; padding: 12px 14px; font: inherit; font-size: 14.5px; margin: 8px 0; }
-.order-row { border: 1px solid #E3E8F4; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; background: #fff; }
-.order-row .row-between { align-items: flex-start; }
-textarea { width: 100%; border: 1.5px solid #E3E8F4; border-radius: 12px; padding: 10px 12px; font: inherit; }
-
-/* Shop event cards: the flyer sits INSIDE the card, full width of the card. */
-.event-card { background: #fff; border: 1px solid #E3E8F4; border-radius: 20px; padding: 14px; margin-bottom: 14px; text-align: left; }
-.event-card img.poster { width: 100%; max-width: 100%; height: auto; display: block; border-radius: 14px; margin-bottom: 10px; }
-.event-card .event-meta { margin-bottom: 12px; line-height: 1.45; }
-
-/* ---------- responsive press feel (both themes) ---------- */
-.btn, .icon-btn, .stepper button, .menu button, .member-card, .theme-fab {
+/* ---------- press feel ---------- */
+.btn, .icon-btn, .stepper button, .step-btn, .menu button, .member-card, .theme-fab {
   touch-action: manipulation;
   transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
-.btn:active, .icon-btn:active, .stepper button:active { transform: scale(0.96); }
+.btn:active, .icon-btn:active, .stepper button:active, .step-btn:active { transform: scale(0.96); }
 .menu button:active, .member-card:active { transform: scale(0.985); }
 
 /* ---------- theme toggle ---------- */
@@ -249,29 +245,138 @@ textarea { width: 100%; border: 1.5px solid #E3E8F4; border-radius: 12px; paddin
   display: flex; align-items: center; justify-content: center; }
 .theme-fab:active { transform: scale(0.94); }
 
-/* ---------- NIGHT MODE: black + deep red ---------- */
+/* file picker follows the theme */
+input[type="file"]::file-selector-button {
+  font: inherit; font-weight: 700; border: 1.5px solid var(--border);
+  background: #EEF2FF; color: var(--violet); border-radius: 10px;
+  padding: 8px 14px; margin-right: 10px; cursor: pointer;
+}
+
+/* ---------- buyer shop ---------- */
+.shop-entry { margin-top: 18px; text-align: left; }
+.bank-box { white-space: pre-wrap; word-break: break-word; background: #F2F5FB; border: 1px solid #E3E8F4;
+  border-radius: 14px; padding: 12px 14px; font: inherit; font-size: 14.5px; margin: 8px 0; }
+.order-row { border: 1px solid #E3E8F4; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; background: #fff; }
+.order-row .row-between { align-items: flex-start; }
+.event-card { background: #fff; border: 1px solid #E3E8F4; border-radius: 20px; padding: 14px; margin-bottom: 14px; text-align: left; }
+.event-card img.poster { width: 100%; max-width: 100%; height: auto; display: block; border-radius: 14px; margin-bottom: 10px; }
+.event-card .event-meta { margin-bottom: 12px; line-height: 1.45; }
+
+/* checkout steps (Zeigarnik: show the path, mark where you are) */
+.steps-bar { display: flex; gap: 6px; margin: 4px 0 14px; }
+.steps-bar span {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700;
+  color: var(--muted); border: 1.5px solid var(--border); border-radius: 999px; padding: 6px 12px 6px 7px;
+}
+.steps-bar span b {
+  width: 20px; height: 20px; border-radius: 50%; background: #E9EDF9; color: var(--muted);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; flex: none;
+}
+.steps-bar span.on { color: var(--text); border-color: var(--text); }
+.steps-bar span.on b { background: var(--grad); color: #fff; }
+.steps-bar span.done { color: var(--muted); }
+.steps-bar span.done b { background: var(--good); color: #fff; }
+
+/* checkout rows + the bill */
+.type-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 2px; border-bottom: 1px solid var(--border); text-align: left; }
+.type-row:last-child { border-bottom: none; }
+.type-info { display: flex; flex-direction: column; gap: 2px; }
+.type-info strong { font-size: 16px; }
+.summary-box { border-top: 1.5px dashed var(--border); padding: 14px 2px 4px; margin: 14px 0; text-align: left; }
+.summary-box .total-row { border-top: 1.5px solid var(--border); margin-top: 6px; padding-top: 8px; font-size: 17px; }
+.total-row { font-size: 17px; }
+.plan-note { background: #FFF7E8; border: 1px solid #F2DFAE; color: #6B5310; border-radius: 12px; padding: 9px 11px; font-size: 13.5px; margin: 10px 0 2px; }
+.check-row { display: flex; gap: 9px; align-items: flex-start; font-weight: 600; }
+.check-row input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+#shopForm h3 { letter-spacing: 0.14em; text-transform: uppercase; font-size: 12px; color: var(--muted); }
+#shopFormTitle { font-size: 21px; }
+
+/* order placed — the peak of the flow gets a ticket (Peak-End) */
+.done-ticket { text-align: center; }
+.done-ref { font-size: 31px; font-weight: 800; letter-spacing: 2px; margin: 4px 0 2px; }
+.done-perf { display: block; border-top: 2px dashed var(--border); margin: 14px -22px 6px; }
+
+/* ---------- ticket-row event cards (the reference card style) ---------- */
+.event-card.ticket-row { padding: 13px 15px 12px; cursor: pointer; }
+.ticket-row:active { transform: scale(0.99); }
+.t-top { display: flex; gap: 13px; align-items: center; }
+.t-thumb { width: 70px; height: 88px; object-fit: contain; background: rgba(0,0,0,0.28); border-radius: 12px; flex: none; }
+.t-main { flex: 1; min-width: 0; text-align: left; }
+.t-date { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+.t-name { font-size: 19px; font-weight: 800; line-height: 1.12; margin: 2px 0; }
+.t-by { font-size: 12.5px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-arrow { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; flex: none; color: var(--muted); }
+.perf { display: none; }
+.ticket-row .perf { display: block; position: relative; border-top: 2px dashed var(--border); margin: 11px -15px 10px; }
+.ticket-row .perf::before, .ticket-row .perf::after { content: ""; position: absolute; top: -7px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); }
+.ticket-row .perf::before { left: -6px; }
+.ticket-row .perf::after { right: -6px; }
+.t-strip { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; }
+.t-venue { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-weight: 600; min-width: 0; }
+.t-venue span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-venue:has(span:empty) { display: none; }
+.t-price { font-weight: 800; white-space: nowrap; margin-left: auto; }
+
+/* ---------- shop hero + host row ---------- */
+.kicker { letter-spacing: 0.22em; text-transform: uppercase; font-size: 11.5px; font-weight: 800; color: var(--blue); }
+.shop-hero { margin: 2px 0 20px; text-align: left; }
+.shop-hero-img { width: 100%; height: auto; display: block; border-radius: 20px; }
+.shop-hero-body { padding: 16px 2px 0; }
+.shop-hero-name { font-size: 36px; line-height: 1.0; margin: 5px 0 6px; }
+.shop-hero-meta { color: var(--muted); font-size: 14.5px; font-weight: 600; margin: 0; }
+.glass-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 13px; }
+.glass-chips span { border: 1px solid var(--border); background: var(--card); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 700; }
+.host-row { display: flex; align-items: center; gap: 9px; margin-top: 13px; }
+.host-avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff; background: linear-gradient(135deg, var(--blue), var(--violet)); flex: none; }
+.host-name { font-weight: 700; font-size: 13.5px; }
+.host-sold { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+
+/* legacy editorial cards (kept for older surfaces) */
+.dir-card { padding: 0; overflow: hidden; }
+.dir-card img.poster { border-radius: 0; margin-bottom: 0; }
+.dir-body { padding: 16px 18px 18px; }
+.dir-name { font-size: 25px; font-weight: 800; line-height: 1.08; margin: 3px 0 5px; }
+.dir-meta { color: var(--muted); font-size: 14px; font-weight: 600; }
+.dir-types { margin-top: 7px; font-size: 14px; font-weight: 600; }
+.dir-price { margin-top: 9px; font-size: 14.5px; color: var(--muted); }
+.dir-price strong { color: var(--text); font-size: 17px; }
+.dir-body .btn { width: 100%; margin-top: 14px; }
+
+/* ---------- public home ---------- */
+.home-wrap { width: 100%; max-width: 560px; margin: 0 auto; }
+#homeScreen .home-wrap { max-width: 600px; }
+.home-wrap .brand-mark { margin-top: 6px; }
+.host-card { margin-top: 22px; }
+.price-pill { display: inline-block; background: var(--grad); color: #fff; font-weight: 800; font-size: 12.5px; border-radius: 999px; padding: 3px 10px; margin-left: 8px; vertical-align: middle; }
+#homeEvents .event-card { margin-bottom: 16px; }
+#signupForm { margin-top: 14px; text-align: left; }
+#signupDone { text-align: left; margin-top: 12px; }
+
+/* ---------- theme picker (Settings) ---------- */
+.theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.theme-card { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 12px; cursor: pointer; text-align: left; font: inherit; }
+.theme-card.current { border-color: var(--violet); }
+.theme-dots { display: flex; gap: 5px; }
+.theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14); }
+.theme-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.theme-cur { font-size: 11px; font-weight: 800; color: var(--violet); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ---------- NIGHT MODE (the floating toggle: black + deep red) ---------- */
 html[data-theme="night"] {
-  --bg: #070405;
-  --card: #171013;
-  --text: #F5EDEE;
-  --muted: #B08A90;
-  --border: #3A2027;
-  --violet: #E5484D;
-  --blue: #B91C1C;
+  --bg: #070405; --card: #171013; --text: #F5EDEE; --muted: #B08A90; --border: #3A2027;
+  --violet: #E5484D; --blue: #B91C1C;
   --grad: linear-gradient(135deg, #7F1D1D, #DC2626);
   --shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
-  --good: #34D399;
-  --bad: #F87171;
-  --warn: #F2C14E;
+  --good: #34D399; --bad: #F87171; --warn: #F2C14E;
 }
 html[data-theme="night"] body { background: var(--bg); }
-html[data-theme="night"] input, html[data-theme="night"] select, html[data-theme="night"] textarea {
-  background: #1E1418; color: var(--text); border-color: var(--border); }
+html[data-theme="night"] input, html[data-theme="night"] select, html[data-theme="night"] textarea { background: #1E1418; color: var(--text); border-color: var(--border); }
 html[data-theme="night"] .btn { background: #2A161B; color: var(--text); }
 html[data-theme="night"] .btn.primary { background: var(--grad); color: #fff; box-shadow: 0 10px 24px rgba(220, 38, 38, 0.30); }
 html[data-theme="night"] .btn.ghost { background: transparent; color: var(--muted); }
 html[data-theme="night"] .btn.linklike { background: transparent; color: var(--violet); }
 html[data-theme="night"] .menu button:active { background: #2A161B; }
+html[data-theme="night"] .member-card { background: #1D1116; }
 html[data-theme="night"] .role-pill { background: #2A161B; color: #F2A0A5; }
 html[data-theme="night"] .role-pill.door { background: #0E2A20; color: var(--good); }
 html[data-theme="night"] .role-pill.seller { background: #2A1E0E; color: var(--warn); }
@@ -294,57 +399,14 @@ html[data-theme="night"] .order-row { background: var(--card); border-color: var
 html[data-theme="night"] .event-card { background: var(--card); border-color: var(--border); }
 html[data-theme="night"] .toast { background: #7F1D1D; color: #fff; }
 html[data-theme="night"] .topbar { background: rgba(7, 4, 5, 0.92); }
-
-/* File picker follows the theme too (the browser's native button otherwise
-   stays bright white in night mode). */
-input[type="file"]::file-selector-button {
-  font: inherit; font-weight: 700; border: 1.5px solid var(--border);
-  background: #EEF2FF; color: var(--violet); border-radius: 10px;
-  padding: 8px 14px; margin-right: 10px; cursor: pointer;
-}
-html[data-theme="night"] input[type="file"] { color: var(--muted); }
-html[data-theme="night"] input[type="file"]::file-selector-button {
-  background: #2A161B; color: var(--text); border-color: var(--border);
-}
-
-/* ---- Checkout (buyer shop) ---- */
-.type-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 12px 4px; border-bottom: 1px solid var(--border); text-align: left;
-}
-.type-row:last-child { border-bottom: none; }
-.type-info { display: flex; flex-direction: column; gap: 2px; }
-.type-info strong { font-size: 16px; }
-.stepper { display: flex; align-items: center; gap: 10px; }
-.step-btn {
-  width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--border);
-  background: #F1F4FA; color: var(--text); font-size: 20px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  transition: transform .08s ease;
-}
-.step-btn:active { transform: scale(.9); }
-.step-qty { min-width: 22px; text-align: center; font-weight: 800; font-size: 16px; }
-.summary-box {
-  background: #F7F9FF; border: 1px solid var(--border); border-radius: 16px;
-  padding: 12px 14px; margin: 14px 0; text-align: left;
-}
-.total-row { border-top: 1.5px solid var(--border); margin-top: 6px; padding-top: 8px; font-size: 17px; }
-.plan-note {
-  background: #FFF7E8; border: 1px solid #F2DFAE; color: #6B5310;
-  border-radius: 12px; padding: 9px 11px; font-size: 13.5px; margin: 10px 0 2px;
-}
-.check-row { display: flex; gap: 9px; align-items: flex-start; font-weight: 600; }
-.check-row input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
 html[data-theme="night"] .step-btn { background: #241419; }
-html[data-theme="night"] .summary-box { background: #120A0D; }
+html[data-theme="night"] .summary-box { border-color: var(--border); }
 html[data-theme="night"] .plan-note { background: #241B08; border-color: #4A3A12; color: #E8CF8F; }
+html[data-theme="night"] input[type="file"] { color: var(--muted); }
+html[data-theme="night"] input[type="file"]::file-selector-button { background: #2A161B; color: var(--text); border-color: var(--border); }
+html[data-theme="night"] .steps-bar span b { background: #2A161B; }
 
-/* Sign-in member cards follow night mode too (they were hard-coded light,
-   which left names white-on-white at night). */
-html[data-theme="night"] .member-card { background: #1D1116; }
-html[data-theme="night"] .member-card .role-pill { background: #2A161B; color: var(--text); }
-
-/* ---------- store skins (per-tenant themes) ---------- */
+/* ---------- store skins (the mall: variable swaps on one system) ---------- */
 html[data-skin="gold"]:not([data-theme="night"]) { --bg: #0A0806; --card: #14100B; --text: #F3EBDD; --muted: #B8A888; --border: #2C2417; --shadow: 0 12px 32px rgba(0,0,0,0.45); }
 html[data-skin="gold"] { --violet: #B97F22; --blue: #E9BC55; --grad: linear-gradient(135deg, #B97F22, #E9BC55); --radius: 20px; }
 html[data-skin="gold"]:not([data-theme="night"]) input,
@@ -361,164 +423,154 @@ html[data-skin="navy"] { --violet: #0F2B52; --blue: #C9A24B; --grad: linear-grad
 html[data-skin="mono"]:not([data-theme="night"]) { --bg: #F4F4F4; --card: #FFFFFF; --text: #111111; --muted: #6E6E6E; --border: #E2E2E2; --shadow: none; }
 html[data-skin="mono"] { --violet: #111111; --blue: #111111; --grad: linear-gradient(135deg, #111111, #111111); --radius: 10px; }
 
-/* theme picker (Settings) */
-.theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-.theme-card { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 12px; cursor: pointer; text-align: left; font: inherit; }
-.theme-card.current { border-color: var(--violet); }
-.theme-dots { display: flex; gap: 5px; }
-.theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14); }
-.theme-name { font-weight: 700; font-size: 14px; color: var(--text); }
-.theme-cur { font-size: 11px; font-weight: 800; color: var(--violet); letter-spacing: 0.06em; text-transform: uppercase; }
-
-/* ---------- public home (events directory) ---------- */
-.home-wrap { width: 100%; max-width: 560px; margin: 0 auto; }
-.home-wrap .brand-mark { margin-top: 6px; }
-.host-card { margin-top: 22px; }
-.price-pill { display: inline-block; background: var(--grad); color: #fff; font-weight: 800; font-size: 12.5px; border-radius: 999px; padding: 3px 10px; margin-left: 8px; vertical-align: middle; }
-#homeEvents .event-card { margin-bottom: 16px; }
-#signupForm { margin-top: 14px; text-align: left; }
-#signupDone { text-align: left; margin-top: 12px; }
-
-/* ---------- Premiere Gold (the flagship skin) ---------- */
+/* Premiere Gold */
 html[data-skin="premiere"]:not([data-theme="night"]) { --bg: #060505; --card: #100D0A; --text: #F5EFE6; --muted: #B8A888; --border: #2C2417; --shadow: 0 16px 40px rgba(0,0,0,0.5); }
 html[data-skin="premiere"] { --violet: #B97F22; --blue: #E9BC55; --grad: linear-gradient(135deg, #B97F22, #E9BC55); --radius: 22px; }
 html[data-skin="premiere"] h1, html[data-skin="premiere"] h2 { font-family: "Fraunces", Georgia, "Times New Roman", serif; letter-spacing: 0.01em; }
+html[data-skin="premiere"] .dir-name { font-family: "Fraunces", Georgia, serif; font-weight: 900; }
 html[data-skin="premiere"]:not([data-theme="night"]) input,
 html[data-skin="premiere"]:not([data-theme="night"]) select,
 html[data-skin="premiere"]:not([data-theme="night"]) textarea { background: #1A1409; color: var(--text); border-color: var(--border); }
 html[data-skin="premiere"]:not([data-theme="night"]) .member-card { background: #1A1409; }
 html[data-skin="premiere"]:not([data-theme="night"]) .topbar { background: rgba(6, 5, 5, 0.92); }
-/* Premiere keeps flyers fully visible — Taylor's rule: a flyer is never cropped or dimmed. */
-
-/* ---------- editorial structure (home + shop) ---------- */
-.kicker { letter-spacing: 0.22em; text-transform: uppercase; font-size: 11.5px; font-weight: 800; color: var(--blue); }
-.dir-card { padding: 0; overflow: hidden; }
-.dir-card img.poster { border-radius: 0; margin-bottom: 0; }
-.dir-body { padding: 16px 18px 18px; }
-.dir-name { font-size: 25px; font-weight: 800; line-height: 1.08; margin: 3px 0 5px; }
-.dir-meta { color: var(--muted); font-size: 14px; font-weight: 600; }
-.dir-types { margin-top: 7px; font-size: 14px; font-weight: 600; }
-.dir-price { margin-top: 9px; font-size: 14.5px; color: var(--muted); }
-.dir-price strong { color: var(--text); font-size: 17px; }
-.dir-body .btn { width: 100%; margin-top: 14px; }
-.shop-hero { margin: 2px 0 20px; text-align: left; }
-.shop-hero-img { width: 100%; height: auto; display: block; border-radius: 20px; }
-.shop-hero-body { padding: 16px 2px 0; }
-.shop-hero-name { font-size: 36px; line-height: 1.0; margin: 5px 0 6px; }
-.shop-hero-meta { color: var(--muted); font-size: 14.5px; font-weight: 600; margin: 0; }
-.glass-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 13px; }
-.glass-chips span { border: 1px solid var(--border); background: var(--card); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 700; }
-#shopForm h3 { letter-spacing: 0.14em; text-transform: uppercase; font-size: 12px; color: var(--muted); }
-#shopFormTitle { font-size: 21px; }
-.type-row { padding: 15px 2px; }
-.summary-box { border-top: 1.5px dashed var(--border); border-radius: 0; background: transparent; padding: 14px 2px 4px; }
-.summary-box .total-row { font-size: 17px; }
-html[data-skin="premiere"] .dir-name { font-family: "Fraunces", Georgia, serif; font-weight: 900; }
 html[data-skin="premiere"] .glass-chips span { background: rgba(255,255,255,0.05); backdrop-filter: blur(8px); }
+/* Premiere keeps flyers fully visible — a flyer is never cropped or dimmed. */
 
-/* ---------- NOIR GLASS (flagship — ambient dark glass) ---------- */
-.perf { display: none; }
+/* ================================================================
+   NOIR GLASS — the flagship. Ambient glow behind everything,
+   frosted glass panels, Baloo 2 display type, white pill actions.
+   The glow stack is defined ONCE (--glow) and reused by the page
+   backdrop and the ticket notches, so a notch always shows the
+   exact light behind the card: a cut, never a painted dot.
+   ================================================================ */
 html[data-skin="noir"] {
-  --bg: #0B0B0F; --card: #17171E; --panel: #121218; --text: #FFFFFF;
+  --bg: #07070C; --card: #14141B; --panel: #101016; --text: #FFFFFF;
   --muted: rgba(255,255,255,0.62); --border: rgba(255,255,255,0.11);
-  --blue: #FFFFFF; --violet: #FF5A36; --field: rgba(255,255,255,0.07);
+  --violet: #FF5A36; --blue: #FFFFFF; --field: rgba(255,255,255,0.07);
+  --grad: linear-gradient(135deg, #FF5A36, #8B3DFF);
+  --shadow: 0 18px 40px rgba(0,0,0,0.45); --radius: 26px;
+  --good: #2ECC8F; --bad: #F87171; --warn: #F2C14E;
+  --glow:
+    radial-gradient(700px 420px at 50% 6%, rgba(255,72,36,0.52), rgba(255,72,36,0) 65%),
+    radial-gradient(720px 520px at 50% 46%, rgba(96,52,200,0.48), rgba(96,52,200,0) 65%),
+    radial-gradient(760px 560px at 50% 88%, rgba(255,150,40,0.38), rgba(255,150,40,0) 65%);
 }
+html[data-skin="noir"] body { background: #07070C; }
 html[data-skin="noir"] body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(700px 420px at 50% 6%, rgba(255,72,36,0.52), transparent 65%),
-    radial-gradient(720px 520px at 50% 46%, rgba(96,52,200,0.48), transparent 65%),
-    radial-gradient(760px 560px at 50% 88%, rgba(255,150,40,0.38), transparent 65%);
+  background: var(--glow);
 }
+/* the glass — one recipe for every panel in the building */
 html[data-skin="noir"] .card,
 html[data-skin="noir"] .login-card,
 html[data-skin="noir"] .event-card,
 html[data-skin="noir"] .member-card,
 html[data-skin="noir"] .hero-card,
-html[data-skin="noir"] .modal-card {
+html[data-skin="noir"] .modal-card,
+html[data-skin="noir"] .sheet-card,
+html[data-skin="noir"] .stat,
+html[data-skin="noir"] .order-row,
+html[data-skin="noir"] .audit-row,
+html[data-skin="noir"] .ticket-row,
+html[data-skin="noir"] .summary-box,
+html[data-skin="noir"] .menu,
+html[data-skin="noir"] .shop-hero,
+html[data-skin="noir"] .theme-card {
   background: linear-gradient(165deg, rgba(255,90,50,0.30), rgba(120,60,220,0.20) 52%, rgba(255,160,60,0.13));
   background-color: rgba(10,10,15,0.40);
   backdrop-filter: blur(22px) saturate(1.6);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
-  border-color: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.13);
   border-radius: 26px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 40px rgba(0,0,0,0.45);
 }
+html[data-skin="noir"] #shopScreen .login-card {
+  background: linear-gradient(165deg, rgba(255,90,50,0.16), rgba(120,60,220,0.12) 55%, rgba(255,160,60,0.08));
+  background-color: rgba(10,10,15,0.35);
+}
 html[data-skin="noir"] h1, html[data-skin="noir"] h2,
-html[data-skin="noir"] .dir-name, html[data-skin="noir"] .ticket-stub > div:first-of-type {
+html[data-skin="noir"] .t-name, html[data-skin="noir"] .shop-hero-name,
+html[data-skin="noir"] .stat .num, html[data-skin="noir"] .done-ref,
+html[data-skin="noir"] .dir-name, html[data-skin="noir"] .ticket-stub .t-code {
   font-family: "Baloo 2", "Plus Jakarta Sans", sans-serif; font-weight: 800; letter-spacing: 0.01em;
 }
-html[data-skin="noir"] .btn { border-radius: 999px; }
-html[data-skin="noir"] .btn.primary { background: #FFFFFF; color: #0B0B0F; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+html[data-skin="noir"] .topbar { background: rgba(7,7,12,0.72); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,255,255,0.07); }
+html[data-skin="noir"] .icon-btn { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.14); color: #fff; box-shadow: none; }
+html[data-skin="noir"] label { color: rgba(255,255,255,0.62); }
+html[data-skin="noir"] input, html[data-skin="noir"] select, html[data-skin="noir"] textarea {
+  background: var(--field); border-color: rgba(255,255,255,0.14); color: #fff;
+}
+html[data-skin="noir"] input::placeholder, html[data-skin="noir"] textarea::placeholder { color: rgba(255,255,255,0.38); }
+html[data-skin="noir"] input:focus, html[data-skin="noir"] select:focus, html[data-skin="noir"] textarea:focus { border-color: rgba(255,255,255,0.45); }
+html[data-skin="noir"] .btn { border-radius: 999px; background: rgba(255,255,255,0.09); color: #fff; border: 1px solid rgba(255,255,255,0.13); }
+html[data-skin="noir"] .btn.primary { background: #FFFFFF; color: #0B0B0F; border-color: #FFFFFF; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+html[data-skin="noir"] .btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+html[data-skin="noir"] .btn.linklike { background: transparent; border-color: transparent; color: #fff; }
+html[data-skin="noir"] .btn[disabled] { opacity: 0.45; }
+html[data-skin="noir"] .stepper button, html[data-skin="noir"] .step-btn { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.14); }
+html[data-skin="noir"] .avatar { background: linear-gradient(135deg, #FF5A36, #8B3DFF); }
+html[data-skin="noir"] .brand-mark { background: linear-gradient(135deg, #FF5A36, #8B3DFF); box-shadow: 0 14px 34px rgba(255,90,50,0.35); }
+html[data-skin="noir"] .role-pill { background: rgba(255,255,255,0.10); color: #fff; }
+html[data-skin="noir"] .role-pill.door { background: rgba(46,204,143,0.16); color: #5EEAB8; }
+html[data-skin="noir"] .role-pill.seller { background: rgba(242,193,78,0.16); color: #F2C14E; }
+html[data-skin="noir"] .chip.paid { background: rgba(46,204,143,0.16); color: #5EEAB8; }
+html[data-skin="noir"] .chip.unpaid { background: rgba(242,193,78,0.16); color: #F2C14E; }
+html[data-skin="noir"] .chip.in { background: rgba(255,255,255,0.12); color: #fff; }
+html[data-skin="noir"] .chip.void { background: rgba(248,113,113,0.16); color: #F87171; }
+html[data-skin="noir"] .bar { background: rgba(255,255,255,0.10); }
+html[data-skin="noir"] .bar > div { background: linear-gradient(90deg, #FF5A36, #8B3DFF); }
+html[data-skin="noir"] .switch { background: rgba(255,255,255,0.18); }
+html[data-skin="noir"] .switch-row input:checked + .switch { background: #FF5A36; }
+html[data-skin="noir"] .dots span { background: rgba(255,255,255,0.25); }
+html[data-skin="noir"] .dots span.on { background: #fff; }
+html[data-skin="noir"] .add-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.25); color: #fff; }
+html[data-skin="noir"] .grace { background: rgba(242,193,78,0.12); border-color: rgba(242,193,78,0.45); color: #F2C14E; }
+html[data-skin="noir"] .recovery-code { background: rgba(242,193,78,0.10); border-color: rgba(242,193,78,0.55); color: #fff; }
+html[data-skin="noir"] .door-result.valid { background: rgba(46,204,143,0.14); border-color: var(--good); color: #5EEAB8; }
+html[data-skin="noir"] .door-result.used { background: rgba(242,193,78,0.12); border-color: var(--warn); color: #F2C14E; }
+html[data-skin="noir"] .door-result.bad { background: rgba(248,113,113,0.12); border-color: var(--bad); color: #F87171; }
+html[data-skin="noir"] .toast { background: #FFFFFF; color: #0B0B0F; }
+html[data-skin="noir"] .theme-fab { background: rgba(20,20,27,0.82); backdrop-filter: blur(12px); border-color: rgba(255,255,255,0.16); color: #fff; }
 html[data-skin="noir"] .kicker { color: rgba(255,255,255,0.55); }
 html[data-skin="noir"] .glass-chips span { background: rgba(255,255,255,0.07); backdrop-filter: blur(10px); border-color: rgba(255,255,255,0.15); color: #fff; }
-html[data-skin="noir"] .perf { display: block; position: relative; border-top: 2px dashed rgba(255,255,255,0.16); margin: 15px 0 13px; }
-html[data-skin="noir"] .perf::before, html[data-skin="noir"] .perf::after {
-  content: ""; position: absolute; top: -12px; width: 24px; height: 24px; border-radius: 50%; background: #0B0B0F;
-}
-html[data-skin="noir"] .perf::before { left: -30px; }
-html[data-skin="noir"] .perf::after { right: -30px; }
-html[data-skin="noir"] #shopForm button[type="submit"] { position: sticky; bottom: 14px; z-index: 5; }
-html[data-skin="noir"] .ticket-stub > div:first-of-type { font-size: 23px !important; }
-html[data-skin="noir"] .stepper button { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.14); }
-html[data-skin="noir"] .theme-toggle { background: rgba(255,255,255,0.08); color: #fff; }
-
-/* host row + fused shop hero */
-.host-row { display: flex; align-items: center; gap: 9px; margin-top: 13px; }
-.host-avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff; background: linear-gradient(135deg, var(--blue), var(--violet)); flex: none; }
-.host-name { font-weight: 700; font-size: 13.5px; }
-.host-sold { color: var(--muted); font-size: 12.5px; font-weight: 600; }
 html[data-skin="noir"] .host-avatar { background: linear-gradient(135deg, #FF5A36, #8B3DFF); }
-html[data-skin="noir"] .shop-hero { background: linear-gradient(165deg, rgba(255,90,50,0.30), rgba(120,60,220,0.20) 52%, rgba(255,160,60,0.13)); background-color: rgba(10,10,15,0.40); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 26px; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 40px rgba(0,0,0,0.45); }
+html[data-skin="noir"] .price-pill { background: #fff; color: #0B0B0F; }
+html[data-skin="noir"] .bank-box { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.16); color: var(--text); }
+html[data-skin="noir"] .plan-note { background: rgba(242,193,78,0.10); border-color: rgba(242,193,78,0.35); color: #E8CF8F; }
+html[data-skin="noir"] .sheet-card button { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.13); color: #fff; }
+html[data-skin="noir"] .sheet-card button.ghost { background: transparent; border: none; color: var(--muted); }
+html[data-skin="noir"] .theme-card.current { border-color: #fff; }
+html[data-skin="noir"] .theme-cur { color: #fff; }
+html[data-skin="noir"] input[type="file"] { color: var(--muted); }
+html[data-skin="noir"] input[type="file"]::file-selector-button { background: rgba(255,255,255,0.10); color: #fff; border-color: rgba(255,255,255,0.16); }
+html[data-skin="noir"] .perforation { border-color: rgba(255,255,255,0.18); }
+html[data-skin="noir"] .admit { background: #fff; color: #0B0B0F; }
+html[data-skin="noir"] .ticket-hero-fallback { background: linear-gradient(135deg, #FF5A36, #8B3DFF); }
+html[data-skin="noir"] .hero-fallback { background: linear-gradient(135deg, #FF5A36, #8B3DFF); }
+/* shop hero: flyer fused into the glass, never cropped or dimmed */
+html[data-skin="noir"] .shop-hero { overflow: hidden; }
 html[data-skin="noir"] .shop-hero-img { border-radius: 0; }
 html[data-skin="noir"] .shop-hero-body { padding: 18px 18px 20px; }
-
-/* ---------- ticket-row cards (the reference card style) ---------- */
-.ticket-row { padding: 14px 16px 13px; cursor: pointer; text-align: left; }
-.ticket-row:active { transform: scale(0.99); }
-.t-top { display: flex; gap: 13px; align-items: center; }
-.t-thumb { width: 62px; height: 80px; object-fit: contain; background: rgba(127,127,127,0.14); border-radius: 12px; flex: none; }
-.t-main { flex: 1; min-width: 0; }
-.t-date { font-size: 12.5px; color: var(--muted); font-weight: 700; }
-.t-name { font-size: 19px; font-weight: 800; line-height: 1.12; margin: 2px 0; }
-.t-by { font-size: 12.5px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.t-arrow { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; flex: none; color: var(--muted); }
-.ticket-row .perf { display: block; position: relative; border-top: 2px dashed var(--border); margin: 13px -16px 11px; }
-.ticket-row .perf::before, .ticket-row .perf::after { content: ""; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); }
-.ticket-row .perf::before { left: -11px; }
-.ticket-row .perf::after { right: -11px; }
-html[data-skin="noir"] .ticket-row .perf::before { left: -11px; }
-html[data-skin="noir"] .ticket-row .perf::after { right: -11px; }
-.t-strip { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; }
-.t-venue { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-weight: 600; min-width: 0; }
-.t-venue span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.t-price { font-weight: 800; white-space: nowrap; }
-html[data-skin="noir"] .t-name { font-family: "Baloo 2", "Plus Jakarta Sans", sans-serif; }
-
-/* ---------- v34 polish ---------- */
-.t-venue:has(span:empty) { display: none; }
-.t-price { margin-left: auto; }
-html[data-skin="noir"] .bank-box { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.16); color: var(--text); }
-html[data-skin="noir"] #shopForm { padding-bottom: 96px; }
-
-/* ---------- v35: reference density + flyer-tinted cards ---------- */
-.ticket-row { padding: 12px 14px 11px; }
-.t-thumb { width: 70px; height: 88px; background: rgba(0,0,0,0.28); }
-.ticket-row .perf { margin: 11px -14px 9px; }
-.ticket-row .perf::before, .ticket-row .perf::after { width: 16px; height: 16px; top: -9px; }
-.ticket-row .perf::before { left: -8px; }
-.ticket-row .perf::after { right: -8px; }
-html[data-skin="noir"] .ticket-row .perf::before { left: -8px; }
-html[data-skin="noir"] .ticket-row .perf::after { right: -8px; }
-#homeScreen .home-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
-html[data-skin="noir"] #shopScreen .login-card { background: linear-gradient(165deg, rgba(255,90,50,0.16), rgba(120,60,220,0.12) 55%, rgba(255,160,60,0.08)); background-color: rgba(10,10,15,0.35); }
-
-/* ---------- v36: true small notches + floating pill buy bar ---------- */
-.ticket-row .perf::before, .ticket-row .perf::after { width: 14px; height: 14px; top: -8px; }
-.ticket-row .perf::before { left: -7px; }
-.ticket-row .perf::after { right: -7px; }
-html[data-skin="noir"] .ticket-row .perf::before, html[data-skin="noir"] .ticket-row .perf::after { width: 14px; height: 14px; top: -8px; }
-html[data-skin="noir"] .ticket-row .perf::before { left: -7px; }
-html[data-skin="noir"] .ticket-row .perf::after { right: -7px; }
-html[data-skin="noir"] body.shop-open #shopBuyBar { left: 14px; right: 14px; bottom: calc(12px + var(--safe-bottom)); border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); padding: 8px; }
-html[data-skin="noir"] body.shop-open #shopBuyBar .btn { border-radius: 999px; }
+/* steps under noir */
+html[data-skin="noir"] .steps-bar span { border-color: rgba(255,255,255,0.16); }
+html[data-skin="noir"] .steps-bar span b { background: rgba(255,255,255,0.12); color: var(--muted); }
+html[data-skin="noir"] .steps-bar span.on { color: #fff; border-color: rgba(255,255,255,0.55); }
+html[data-skin="noir"] .steps-bar span.on b { background: #fff; color: #0B0B0F; }
+html[data-skin="noir"] .steps-bar span.done b { background: var(--good); color: #06281B; }
+html[data-skin="noir"] .done-perf { border-color: rgba(255,255,255,0.16); }
+/* the ticket tear, final form: notches sample the page glow itself */
+html[data-skin="noir"] .ticket-row .perf { border-top-color: rgba(255,255,255,0.16); }
+html[data-skin="noir"] .ticket-row .perf::before,
+html[data-skin="noir"] .ticket-row .perf::after {
+  background-color: #07070C;
+  background-image: var(--glow);
+  background-attachment: fixed;
+}
+/* sticky order button: a white pill riding the bottom of the form.
+   In the form it sits BEFORE the bank and receipt fields, so it
+   settles into its slot above them and can never cover them. */
+html[data-skin="noir"] #shopForm button[type="submit"] {
+  position: sticky; bottom: 14px; z-index: 5;
+  border-radius: 999px; box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+}
+html[data-skin="noir"] #shopForm { padding-bottom: 48px; }
