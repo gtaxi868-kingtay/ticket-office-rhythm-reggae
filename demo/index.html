@@ -118,6 +118,7 @@
     <p class="muted">Pick your event, place your order, then pay by bank transfer.
       Your tickets are confirmed when the organiser accepts your order.</p>
     <div id="shopEvents"></div>
+    <div class="steps-bar hidden" id="shopSteps"><span data-step="1"><b>1</b> Tickets</span><span data-step="2"><b>2</b> Your details</span><span data-step="3"><b>3</b> Done</span></div>
     <form id="shopForm" class="hidden">
       <div id="shopHero" class="shop-hero hidden">
         <img id="shopHeroImg" class="shop-hero-img" alt="">
@@ -136,17 +137,19 @@
       <div class="summary-box" id="shopSummary"></div>
       <label>Your name<input id="shopName" autocomplete="name" placeholder="Full name"></label>
       <label>Your WhatsApp number<input id="shopPhone" type="tel" placeholder="1868..."></label>
+      <p id="shopError" class="error hidden"></p>
+      <button type="submit" class="btn primary big">Place order</button>
       <div id="shopFormBankBox" class="hidden">
         <h3>Pay by bank transfer</h3>
         <pre id="shopFormBank" class="bank-box"></pre>
       </div>
       <label>Already paid? Attach your transfer receipt (screenshot or PDF)
         <input id="shopReceipt" type="file" accept="image/*,.pdf"></label>
-      <p id="shopError" class="error hidden"></p>
-      <button type="submit" class="btn primary big">Place order</button>
     </form>
     <div id="shopDone" class="hidden">
       <h2>Order placed</h2>
+      <div id="shopDoneRef" class="done-ref"></div>
+      <div class="perf done-perf"></div>
       <p id="shopDoneText"></p>
       <div id="shopBankBox" class="hidden">
         <h3>Pay by bank transfer</h3>
