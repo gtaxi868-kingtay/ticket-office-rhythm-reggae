@@ -1,7 +1,7 @@
 // Ticket Office service worker — caches the app shell so the app OPENS
 // offline after the first load (venue Wi-Fi is not required to open it).
 // Live data still needs a connection; sales/check-ins are never faked offline.
-const CACHE = "ticket-office-v33";
+const CACHE = "ticket-office-v35";
 const SHELL = [
   "./",
   "./index.html",

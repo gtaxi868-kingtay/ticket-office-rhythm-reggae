@@ -494,3 +494,21 @@ html[data-skin="noir"] .ticket-row .perf::after { right: -11px; }
 .t-venue span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .t-price { font-weight: 800; white-space: nowrap; }
 html[data-skin="noir"] .t-name { font-family: "Baloo 2", "Plus Jakarta Sans", sans-serif; }
+
+/* ---------- v34 polish ---------- */
+.t-venue:has(span:empty) { display: none; }
+.t-price { margin-left: auto; }
+html[data-skin="noir"] .bank-box { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.16); color: var(--text); }
+html[data-skin="noir"] #shopForm { padding-bottom: 96px; }
+
+/* ---------- v35: reference density + flyer-tinted cards ---------- */
+.ticket-row { padding: 12px 14px 11px; }
+.t-thumb { width: 70px; height: 88px; background: rgba(0,0,0,0.28); }
+.ticket-row .perf { margin: 11px -14px 9px; }
+.ticket-row .perf::before, .ticket-row .perf::after { width: 16px; height: 16px; top: -9px; }
+.ticket-row .perf::before { left: -8px; }
+.ticket-row .perf::after { right: -8px; }
+html[data-skin="noir"] .ticket-row .perf::before { left: -8px; }
+html[data-skin="noir"] .ticket-row .perf::after { right: -8px; }
+#homeScreen .home-wrap { max-width: 600px; width: 100%; margin: 0 auto; }
+html[data-skin="noir"] #shopScreen .login-card { background: linear-gradient(165deg, rgba(255,90,50,0.16), rgba(120,60,220,0.12) 55%, rgba(255,160,60,0.08)); background-color: rgba(10,10,15,0.35); }
