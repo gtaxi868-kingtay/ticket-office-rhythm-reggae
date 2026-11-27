@@ -1178,11 +1178,29 @@ function tintCard(el, url) {
         const x = c.getContext("2d"); if (!x) return;
         x.drawImage(im, 0, 0, 8, 8);
         const d = x.getImageData(0, 0, 8, 8).data;
-        let r = 0, g = 0, b = 0, n = 0;
-        for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
-        r = Math.round(r / n); g = Math.round(g / n); b = Math.round(b / n);
-        const dk = (v, f) => Math.round(v * f);
-        el.style.background = "linear-gradient(160deg, rgba(" + r + "," + g + "," + b + ",0.60), rgba(" + dk(r, 0.5) + "," + dk(g, 0.5) + "," + dk(b, 0.62) + ",0.52) 58%, rgba(12,10,16,0.50))";
+        let r = 0, g = 0, b = 0, w = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const mx = Math.max(d[i], d[i + 1], d[i + 2]);
+          if (mx < 36) continue;
+          const wt = mx / 255;
+          r += d[i] * wt; g += d[i + 1] * wt; b += d[i + 2] * wt; w += wt;
+        }
+        if (!w) return;
+        r = Math.round(r / w); g = Math.round(g / w); b = Math.round(b / w);
+        const rf = r / 255, gf = g / 255, bf = b / 255;
+        const mx2 = Math.max(rf, gf, bf), mn2 = Math.min(rf, gf, bf);
+        let h = 0, s = 0; const l = (mx2 + mn2) / 2;
+        if (mx2 !== mn2) {
+          const dd = mx2 - mn2;
+          s = l > 0.5 ? dd / (2 - mx2 - mn2) : dd / (mx2 + mn2);
+          if (mx2 === rf) h = (gf - bf) / dd + (gf < bf ? 6 : 0);
+          else if (mx2 === gf) h = (bf - rf) / dd + 2;
+          else h = (rf - gf) / dd + 4;
+          h *= 60;
+        }
+        s = Math.max(s, 0.55);
+        const ll = Math.min(Math.max(l, 0.30), 0.46);
+        el.style.background = "linear-gradient(160deg, hsla(" + Math.round(h) + "," + Math.round(s * 100) + "%," + Math.round(ll * 100) + "%,0.66), hsla(" + Math.round(h) + "," + Math.round(s * 100) + "%," + Math.round(ll * 62) + "%,0.55) 58%, rgba(12,10,16,0.50))";
       } catch (e) { /* image not readable: keep the house tint */ }
     };
     im.src = url;
