@@ -4,47 +4,54 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <title>Ticket Office — Sell tickets the way Trinidad already pays</title>
 <meta name="description" content="Flat monthly rent for event ticketing in Trinidad & Tobago. Bank transfer, WhatsApp and card — your money goes straight to your own bank. No percentage of your gate, ever.">
 <style>
-  :root { --ink:#F5EFE6; --muted:#B8A888; --violet:#B97F22; --blue:#E9BC55; --red:#E5484D; --line:#2C2417; --card:#100D0A; --bg:#060505; }
+  :root { --ink:#FFFFFF; --muted:rgba(255,255,255,.62); --line:rgba(255,255,255,.13); --bg:#07070C; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+  body::before { content:""; position:fixed; inset:0; z-index:-1; background:
+    radial-gradient(700px 420px at 50% 6%, rgba(255,72,36,.52), rgba(255,72,36,0) 65%),
+    radial-gradient(720px 520px at 50% 46%, rgba(96,52,200,.48), rgba(96,52,200,0) 65%),
+    radial-gradient(760px 560px at 50% 88%, rgba(255,150,40,.38), rgba(255,150,40,0) 65%); }
   .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
   header { padding: 22px 0 6px; display:flex; align-items:center; gap:10px; }
-  .mark { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,var(--violet),var(--blue)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:19px; }
-  .brand { font-weight:800; font-size:19px; }
+  .mark { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,#FF5A36,#8B3DFF); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:19px; font-family:"Baloo 2", sans-serif; }
+  .brand { font-weight:800; font-size:19px; font-family:"Baloo 2", sans-serif; }
   .hero { padding: 42px 0 10px; text-align:center; }
-  .hero h1 { font-family:"Fraunces", Georgia, serif; font-weight:900; font-size: clamp(32px, 6vw, 54px); line-height:1.08; margin: 0 0 14px; letter-spacing:-.5px; }
-  .hero h1 .grad { background:linear-gradient(90deg,var(--violet),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero h1 { font-family:"Baloo 2", sans-serif; font-weight:800; font-size: clamp(34px, 6vw, 56px); line-height:1.05; margin: 0 0 14px; }
+  .hero h1 .grad { background:linear-gradient(90deg,#FF5A36,#B78CFF); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .hero p { font-size: clamp(16px, 2.6vw, 19px); color:var(--muted); max-width:640px; margin:0 auto 26px; line-height:1.55; }
   .cta-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
   .btn { display:inline-block; padding:14px 26px; border-radius:999px; font-weight:700; text-decoration:none; font-size:16px; }
-  .btn.primary { background:linear-gradient(135deg,var(--violet),var(--blue)); color:#171106; box-shadow:0 10px 24px rgba(217,164,65,.30); }
-  .btn.ghost { background:transparent; color:var(--ink); border:1.5px solid var(--violet); }
+  .btn.primary { background:#fff; color:#0B0B0F; box-shadow:0 12px 30px rgba(0,0,0,.5); }
+  .btn.ghost { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid var(--line); }
   section { padding: 44px 0 6px; }
-  h2 { font-family:"Fraunces", Georgia, serif; font-size: clamp(24px, 4vw, 32px); margin:0 0 8px; letter-spacing:-.3px; }
+  h2 { font-family:"Baloo 2", sans-serif; font-weight:800; font-size: clamp(25px, 4vw, 34px); margin:0 0 8px; }
   .sub { color:var(--muted); margin:0 0 22px; line-height:1.55; }
-  table { width:100%; border-collapse:collapse; background:var(--card); border-radius:18px; overflow:hidden; box-shadow:0 4px 18px rgba(20,22,31,.06); }
+  .glass { background:linear-gradient(165deg, rgba(255,90,50,.30), rgba(120,60,220,.20) 52%, rgba(255,160,60,.13)); background-color:rgba(10,10,15,.40); backdrop-filter:blur(22px) saturate(1.6); -webkit-backdrop-filter:blur(22px) saturate(1.6); border:1px solid var(--line); box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 18px 40px rgba(0,0,0,.45); }
+  table { width:100%; border-collapse:collapse; border-radius:20px; overflow:hidden; }
   th, td { padding:14px 16px; text-align:left; font-size:15px; border-bottom:1px solid var(--line); }
-  th { background:#171208; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  th { background:rgba(255,255,255,.05); font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
   tr:last-child td { border-bottom:none; }
-  tr.us td { background:#1D1608; font-weight:700; }
+  tr.us td { background:rgba(255,255,255,.10); font-weight:700; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
-  .feat { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+  .feat { border-radius:20px; padding:18px; }
   .feat h3 { margin:0 0 6px; font-size:16.5px; }
   .feat p { margin:0; color:var(--muted); font-size:14.5px; line-height:1.5; }
-  .price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
-  .price { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:22px; text-align:center; }
-  .price.hot { border:2px solid var(--violet); }
-  .price .amt { font-size:34px; font-weight:800; margin:6px 0 2px; }
+  .price-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; align-items:stretch; }
+  .price { border-radius:22px; padding:22px; text-align:center; }
+  .price.hot { background:#fff; color:#0B0B0F; transform:scale(1.03); box-shadow:0 24px 50px rgba(0,0,0,.5); }
+  .price.hot .per, .price.hot p { color:rgba(11,11,15,.62); }
+  .badge { display:inline-block; background:linear-gradient(135deg,#FF5A36,#8B3DFF); color:#fff; font-size:11.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; padding:5px 11px; border-radius:999px; margin-bottom:10px; }
+  .price .amt { font-family:"Baloo 2", sans-serif; font-size:36px; font-weight:800; margin:6px 0 2px; }
   .price .per { color:var(--muted); font-size:14px; }
   .price p { color:var(--muted); font-size:14.5px; line-height:1.5; }
-  .night { background:#0B0608; color:#F5EDEF; border-radius:24px; padding:30px 26px; margin-top:14px; }
+  .night { border-radius:24px; padding:30px 26px; margin-top:14px; }
   .night h2 { color:#fff; }
-  .night p { color:#CBB9BE; line-height:1.6; margin:0; }
-  .night .accent { color:#FF6B6B; font-weight:700; }
+  .night p { color:var(--muted); line-height:1.6; margin:0; }
+  .night .accent { color:#FF8A5C; font-weight:700; }
   footer { padding:44px 0 40px; text-align:center; color:var(--muted); font-size:14px; }
 </style>
 </head>
@@ -67,7 +74,7 @@
   <section>
     <h2>The maths, on one real night</h2>
     <p class="sub">300 guests at TT$100 a ticket — a TT$30,000 gate. Here's what each platform takes out of it, and when you see your money.</p>
-    <table>
+    <table class="glass">
       <tr><th>Platform</th><th>Their cut</th><th>Your money arrives</th></tr>
       <tr><td>Island eTickets (8%)</td><td>TT$2,400</td><td>5 business days after the event</td></tr>
       <tr><td>Taack (7% + TT$1.80/order)</td><td>≈ TT$2,100+</td><td>About 3 days after the event</td></tr>
@@ -80,16 +87,16 @@
     <h2>Everything the big platforms do — priced for the events they ignore</h2>
     <p class="sub">Built for the 50-to-500-guest middle: fundraisers, school and church events, club fetes, boat rides, comedy and dance shows.</p>
     <div class="grid">
-      <div class="feat"><h3>A real checkout</h3><p>Buyers pick tickets and add-ons with steppers, answer your questions, and see the full total before they commit — then pay by transfer, card link, and attach their receipt.</p></div>
-      <div class="feat"><h3>Payment plans</h3><p>Deposit today, balance later — tracked per order, so a TT$1,200 all-inclusive doesn't need TT$1,200 today. No card required.</p></div>
-      <div class="feat"><h3>Who sold what</h3><p>Every seller signs in with their own PIN. Every ticket carries their name. The cash-up sheet shows what each person owes you, ready to print.</p></div>
-      <div class="feat"><h3>A door that can't be fooled</h3><p>Codes are generated by the system and verified against a secret only the server holds. A used ticket says ALREADY USED — with the time and the name of who let it in first. Unpaid tickets are flagged on screen.</p></div>
-      <div class="feat"><h3>Transfers done safely</h3><p>A buyer can't come? Transfer the ticket to the new holder — the old code dies and a fresh one is issued. Screenshots can't get two people in.</p></div>
-      <div class="feat"><h3>Break-even, live</h3><p>Set your target and watch the dashboard count you toward it: how much is in, and how many more tickets cover the night.</p></div>
+      <div class="feat glass"><h3>A real checkout</h3><p>Buyers pick tickets and add-ons with steppers, answer your questions, and see the full total before they commit — then pay by transfer, card link, and attach their receipt.</p></div>
+      <div class="feat glass"><h3>Payment plans</h3><p>Deposit today, balance later — tracked per order, so a TT$1,200 all-inclusive doesn't need TT$1,200 today. No card required.</p></div>
+      <div class="feat glass"><h3>Who sold what</h3><p>Every seller signs in with their own PIN. Every ticket carries their name. The cash-up sheet shows what each person owes you, ready to print.</p></div>
+      <div class="feat glass"><h3>A door that can't be fooled</h3><p>Codes are generated by the system and verified against a secret only the server holds. A used ticket says ALREADY USED — with the time and the name of who let it in first. Unpaid tickets are flagged on screen.</p></div>
+      <div class="feat glass"><h3>Transfers done safely</h3><p>A buyer can't come? Transfer the ticket to the new holder — the old code dies and a fresh one is issued. Screenshots can't get two people in.</p></div>
+      <div class="feat glass"><h3>Break-even, live</h3><p>Set your target and watch the dashboard count you toward it: how much is in, and how many more tickets cover the night.</p></div>
     </div>
-    <div class="night">
-      <h2>And at the door, it goes <span class="accent">black &amp; red</span>.</h2>
-      <p>One tap on the moon button and the whole app — sellers, door, shop — switches to a black and deep-red night mode made for working a gate in the dark. Buttons answer the instant you touch them. Day or night, your flyer is never cropped: what your buyers screenshot and forward is your poster, whole.</p>
+    <div class="night glass">
+      <h2>Glass in the shop. <span class="accent">Black &amp; red</span> at the door.</h2>
+      <p>Your store wears the glass look on this page — every event card tinted by its own flyer's colours, your poster always whole, never cropped. And when you're working the gate in the dark, one tap on the moon button switches the whole app to a black and deep-red night mode. Buttons answer the instant you touch them.</p>
     </div>
   </section>
 
@@ -98,18 +105,19 @@
     <p class="sub">Every event you run is included. No tiers, no add-on fees, no percentage.</p>
     <div class="price-grid">
       <div class="price hot">
+        <div class="badge">First 10 organisers</div>
         <div>Founding</div>
         <div class="amt">TT$299</div>
         <div class="per">per month</div>
         <p>First 10 organisers. Price locked for 12 months. All events, all features.</p>
       </div>
-      <div class="price">
+      <div class="price glass">
         <div>Standard</div>
         <div class="amt">TT$449</div>
         <div class="per">per month</div>
         <p>The same whole system, once the founding seats are gone.</p>
       </div>
-      <div class="price">
+      <div class="price glass">
         <div>One-off event</div>
         <div class="amt">TT$750</div>
         <div class="per">per event</div>
