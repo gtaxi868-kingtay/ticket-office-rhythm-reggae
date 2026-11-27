@@ -1166,6 +1166,18 @@ async function pickSkin(key) {
 function goStore(slug) { location.href = location.pathname + "?s=" + encodeURIComponent(slug) + "&shop"; }
 function goStoreTeam(slug) { location.href = location.pathname + "?s=" + encodeURIComponent(slug); }
 
+function updateSteps(stage) {
+  const bar = $("shopSteps"); if (!bar) return;
+  const set = (n, cls) => {
+    const el = bar.querySelector('[data-step="' + n + '"]'); if (!el) return;
+    el.classList.toggle("on", cls === "on");
+    el.classList.toggle("done", cls === "done");
+  };
+  if (stage === 3) { set(1, "done"); set(2, "done"); set(3, "on"); }
+  else if (stage === 2) { set(1, "done"); set(2, "on"); set(3, ""); }
+  else { set(1, "on"); set(2, ""); set(3, ""); }
+}
+
 function tintCard(el, url) {
   if (!el || !url) return;
   if (document.documentElement.dataset.skin !== "noir") return;
@@ -1198,9 +1210,9 @@ function tintCard(el, url) {
           else h = (rf - gf) / dd + 4;
           h *= 60;
         }
-        s = Math.max(s, 0.55);
-        const ll = Math.min(Math.max(l, 0.30), 0.46);
-        el.style.background = "linear-gradient(160deg, hsla(" + Math.round(h) + "," + Math.round(s * 100) + "%," + Math.round(ll * 100) + "%,0.66), hsla(" + Math.round(h) + "," + Math.round(s * 100) + "%," + Math.round(ll * 62) + "%,0.55) 58%, rgba(12,10,16,0.50))";
+        s = Math.max(s, 0.7);
+        const ll = Math.min(Math.max(l, 0.36), 0.52);
+        el.style.background = "linear-gradient(160deg, hsla(" + Math.round(h) + "," + Math.round(s * 100) + "%," + Math.round(ll * 100) + "%,0.9), hsla(" + Math.round(h) + "," + Math.round(s * 100) + "%," + Math.round(ll * 78) + "%,0.82) 58%, rgba(12,10,16,0.55))";
       } catch (e) { /* image not readable: keep the house tint */ }
     };
     im.src = url;
@@ -1281,6 +1293,7 @@ function shopUrl() {
 }
 
 async function openShop() {
+  $("shopSteps").classList.add("hidden");
   $("loginScreen").classList.add("hidden");
   $("app").classList.add("hidden");
   $("shopScreen").classList.remove("hidden");
@@ -1352,6 +1365,12 @@ function selectShopEvent(id) {
   renderShopTypes();
   renderShopQuestions();
   $("shopForm").classList.remove("hidden");
+  $("shopSteps").classList.remove("hidden");
+  updateSteps(1);
+  try {
+    if (!$("shopName").value) $("shopName").value = localStorage.getItem("to_buyer_name") || "";
+    if (!$("shopPhone").value) $("shopPhone").value = localStorage.getItem("to_buyer_phone") || "";
+  } catch (e) { /* private mode: no memory, no problem */ }
   $("shopDone").classList.add("hidden");
   const bank = ((shopData && shopData.bank_details) || "").trim();
   $("shopFormBankBox").classList.toggle("hidden", !bank);
@@ -1420,6 +1439,7 @@ function updateShopSummary() {
   $("shopSummary").innerHTML = html;
   const submitBtn = document.querySelector("#shopForm button[type=submit]");
   if (submitBtn) submitBtn.textContent = lines.length ? "Place order \u2022 " + money(total) : "Place order";
+  updateSteps(lines.length ? 2 : 1);
 }
 
 /* Add-to-calendar (.ics) built locally — event times are free text like
@@ -1511,6 +1531,12 @@ async function submitShopOrder(ev) {
   const linesText = lines.map((l) => l.qty + " × " + l.type.name).join(", ");
   $("shopForm").classList.add("hidden");
   $("shopDone").classList.remove("hidden");
+  $("shopDoneRef").textContent = r.ref;
+  updateSteps(3);
+  try {
+    localStorage.setItem("to_buyer_name", $("shopName").value.trim());
+    localStorage.setItem("to_buyer_phone", $("shopPhone").value.trim());
+  } catch (e) { /* ignore */ }
   $("shopDoneText").textContent = "Thank you, " + $("shopName").value.trim() + ". Your order " +
     "(reference " + r.ref + "): " + linesText + " for " + r.event_name + " — total " + money(r.total) + ". " +
     (r.deposit_due != null
