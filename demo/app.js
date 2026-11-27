@@ -1166,6 +1166,29 @@ async function pickSkin(key) {
 function goStore(slug) { location.href = location.pathname + "?s=" + encodeURIComponent(slug) + "&shop"; }
 function goStoreTeam(slug) { location.href = location.pathname + "?s=" + encodeURIComponent(slug); }
 
+function tintCard(el, url) {
+  if (!el || !url) return;
+  if (document.documentElement.dataset.skin !== "noir") return;
+  try {
+    const im = new Image();
+    if (!/^data:/.test(url)) im.crossOrigin = "anonymous";
+    im.onload = () => {
+      try {
+        const c = document.createElement("canvas"); c.width = 8; c.height = 8;
+        const x = c.getContext("2d"); if (!x) return;
+        x.drawImage(im, 0, 0, 8, 8);
+        const d = x.getImageData(0, 0, 8, 8).data;
+        let r = 0, g = 0, b = 0, n = 0;
+        for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+        r = Math.round(r / n); g = Math.round(g / n); b = Math.round(b / n);
+        const dk = (v, f) => Math.round(v * f);
+        el.style.background = "linear-gradient(160deg, rgba(" + r + "," + g + "," + b + ",0.60), rgba(" + dk(r, 0.5) + "," + dk(g, 0.5) + "," + dk(b, 0.62) + ",0.52) 58%, rgba(12,10,16,0.50))";
+      } catch (e) { /* image not readable: keep the house tint */ }
+    };
+    im.src = url;
+  } catch (e) { /* keep the house tint */ }
+}
+
 async function openHome() {
   $("loginScreen").classList.add("hidden");
   $("app").classList.add("hidden");
@@ -1200,6 +1223,7 @@ async function openHome() {
     </div>`).join("");
   $("homeEvents").querySelectorAll("[data-store]").forEach((b) =>
     b.addEventListener("click", () => goStore(b.dataset.store)));
+  $("homeEvents").querySelectorAll(".ticket-row").forEach((card, i) => tintCard(card, evs[i].flyer_url));
 }
 
 async function submitSignup(ev) {
@@ -1256,7 +1280,7 @@ async function openShop() {
     return;
   }
   applySkin(shopData.theme || "fintech");
-  $("shopBiz").textContent = shopData.business_name + " — Tickets";
+  $("shopBiz").textContent = shopData.business_name;
   const evs = shopData.events || [];
   $("shopEvents").innerHTML = evs.length ? evs.map((e) => `
     <div class="event-card ticket-row" data-shop-ev="${e.id}" role="button" tabindex="0" aria-label="Order tickets for ${esc(e.name)}">
@@ -1278,6 +1302,7 @@ async function openShop() {
     : "<p class=\"muted\">No events are on sale right now.</p>";
   $("shopEvents").querySelectorAll("[data-shop-ev]").forEach((b) =>
     b.addEventListener("click", () => selectShopEvent(b.getAttribute("data-shop-ev"))));
+  $("shopEvents").querySelectorAll(".ticket-row").forEach((card, i) => tintCard(card, evs[i].flyer_url));
 }
 
 /* Checkout: pick quantities across ticket types and add-ons, answer the
@@ -1300,6 +1325,7 @@ function selectShopEvent(id) {
     $("shopHeroName").textContent = shopEvent.name;
     $("shopHeroMeta").textContent = [fmtDate(shopEvent.event_date), shopEvent.start_time, shopEvent.venue].filter(Boolean).join(" • ");
     $("shopHeroAvatar").textContent = (shopData.business_name || "T").trim().charAt(0).toUpperCase();
+    tintCard(hero, shopEvent.flyer_url);
     $("shopHeroHost").textContent = "Hosted by " + (shopData.business_name || "");
     $("shopHeroSold").textContent = shopEvent.sold > 0 ? shopEvent.sold + (shopEvent.sold === 1 ? " ticket sold" : " tickets sold") : "";
     $("shopHeroChips").innerHTML = (shopEvent.types || []).filter((t) => !t.is_addon)
