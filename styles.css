@@ -574,3 +574,53 @@ html[data-skin="noir"] #shopForm button[type="submit"] {
   border-radius: 999px; box-shadow: 0 10px 28px rgba(0,0,0,0.45);
 }
 html[data-skin="noir"] #shopForm { padding-bottom: 48px; }
+
+/* ===== Pick cards, stats pill, search pill — the reference system
+   (Dribbble 27715428): photo cards on a pale canvas, white pills,
+   one magenta action per card. Variable-driven: every skin renders
+   these in its own language. ===== */
+.pick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pick-grid > p { grid-column: 1 / -1; }
+.pick-card { background: var(--card); border: 1px solid var(--border); border-radius: 22px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow); display: flex; flex-direction: column; text-align: left; transition: transform .12s ease; }
+.pick-card:active { transform: scale(.985); }
+.pick-media { position: relative; height: 148px; background: #E9DDED; overflow: hidden; flex: none; }
+.pick-ambient { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(18px) saturate(1.4); transform: scale(1.3); opacity: .9; }
+.pick-flyer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.pick-noimg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 52px; font-weight: 800; color: rgba(26,20,31,.35); background: linear-gradient(150deg, #F6D9EE, #E9DDED); }
+.pick-body { padding: 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.pick-by { font-size: 11.5px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-title { font-size: 16px; font-weight: 800; line-height: 1.22; color: var(--text); }
+.pick-meta { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.pick-meta svg { flex: none; }
+.pick-cta { pointer-events: none; border: none; width: 100%; padding: 11px 8px; border-radius: 999px; background: #E754B8; color: #fff; font: inherit; font-size: 13.5px; font-weight: 700; text-align: center; margin-top: auto; }
+.stats-pill { display: flex; align-items: stretch; background: var(--card); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow); padding: 12px 4px; margin: 18px 0 12px; }
+.stats-pill .seg { flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px; min-width: 0; }
+.stats-pill .seg + .seg { border-left: 1px solid var(--border); }
+.stats-pill .dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex: none; }
+.stats-pill .num { display: block; font-size: 16.5px; font-weight: 800; line-height: 1.05; color: var(--text); }
+.stats-pill .lab { display: block; font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.search-pill { display: flex; align-items: center; gap: 9px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 6px 16px; box-shadow: var(--shadow); margin-bottom: 16px; color: var(--muted); }
+.search-pill input { flex: 1; border: none; background: none; outline: none; font: inherit; font-size: 15px; color: var(--text); padding: 9px 0; min-width: 0; box-shadow: none; }
+.search-pill input::placeholder { color: var(--muted); }
+html[data-skin="noir"] .pick-card, html[data-skin="noir"] .stats-pill, html[data-skin="noir"] .search-pill {
+  background: linear-gradient(165deg, rgba(255,90,50,0.30), rgba(120,60,220,0.20) 52%, rgba(255,160,60,0.13));
+  background-color: rgba(10,10,15,0.40); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border-color: rgba(255,255,255,0.13);
+}
+
+/* ===== CANDY — the flagship (Taylor's Dribbble pick, 28 Nov 2026).
+   Pale lilac-pink canvas, white surfaces, near-black plum text,
+   one vivid magenta. Sans throughout: emphasis comes from colour
+   and photography, not display type. Night mode still wins: the
+   variable block stands down when data-theme="night". ===== */
+html[data-skin="candy"]:not([data-theme="night"]) {
+  --bg: #FCEEF6; --card: #FFFFFF; --text: #1A141F; --muted: #5B5464;
+  --border: #EDDEF2; --violet: #EA0F9E; --blue: #2F80ED;
+  --grad: linear-gradient(135deg, #EA0F9E, #C44FE0);
+  --shadow: 0 12px 32px rgba(73, 49, 79, 0.10);
+}
+html[data-skin="candy"] body::before { background: radial-gradient(700px 380px at 50% -60px, rgba(234,15,158,.14), rgba(234,15,158,0) 65%), radial-gradient(600px 420px at 92% 32%, rgba(136,96,145,.10), rgba(136,96,145,0) 65%); }
+html[data-skin="candy"] .btn.primary { background: #EA0F9E; box-shadow: 0 10px 24px rgba(234,15,158,.30); }
+html[data-skin="candy"] .steps-bar span.on { background: #EA0F9E; color: #fff; border-color: transparent; }
+html[data-skin="candy"] .steps-bar span.on b { background: rgba(255,255,255,.25); color: #fff; }
+html[data-skin="candy"] .chip.on { background: #EA0F9E; border-color: transparent; color: #fff; }
