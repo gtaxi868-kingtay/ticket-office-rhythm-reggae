@@ -29,7 +29,9 @@
     <div class="brand-mark"></div>
     <h1 style="text-align:center">Ticket Office</h1>
     <p class="muted" style="text-align:center">Events on sale now — tap one to get your tickets.</p>
-    <div id="homeEvents"></div>
+    <div id="homeStats" class="stats-pill hidden"></div>
+    <div class="search-pill"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg><input id="homeSearch" type="search" placeholder="Search events, places, organisers" autocomplete="off" aria-label="Search events"></div>
+    <div id="homeEvents" class="pick-grid"></div>
     <div class="card host-card">
       <h2>Hosting an event?</h2>
       <p class="muted">Open your own ticket store in about a minute: your own shop link, your own team, your money paid straight to your bank. Free for your first 30 days.</p>
@@ -117,7 +119,7 @@
     <h1 id="shopBiz">Ticket shop</h1>
     <p class="muted">Pick your event, place your order, then pay by bank transfer.
       Your tickets are confirmed when the organiser accepts your order.</p>
-    <div id="shopEvents"></div>
+    <div id="shopEvents" class="pick-grid"></div>
     <div class="steps-bar hidden" id="shopSteps"><span data-step="1"><b>1</b> Tickets</span><span data-step="2"><b>2</b> Your details</span><span data-step="3"><b>3</b> Done</span></div>
     <form id="shopForm" class="hidden">
       <div id="shopHero" class="shop-hero hidden">
