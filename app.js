@@ -1124,6 +1124,7 @@ function toggleTheme() {
 
 /* ---------------- store skins (per-tenant theme — "the mall") ---------------- */
 const SKINS = [
+  { key: "candy", name: "Candy", dots: ["#EA0F9E", "#FCEEF6", "#1A141F"] },
   { key: "noir", name: "Noir Glass", dots: ["#FFFFFF", "#0B0B0F", "#FF5A36"] },
   { key: "premiere", name: "Premiere Gold", dots: ["#E9BC55", "#060505", "#F5EFE6"] },
   { key: "fintech", name: "Clean Fintech", dots: ["#7C3AED", "#3B82F6", "#F6F7FB"] },
@@ -1224,36 +1225,41 @@ async function openHome() {
   $("app").classList.add("hidden");
   $("shopScreen").classList.add("hidden");
   $("homeScreen").classList.remove("hidden");
-  applySkin("noir");
+  applySkin("candy");
   $("homeEvents").innerHTML = "<p class='muted'>Loading events…</p>";
   let r;
   try { r = await rpc("public_events", {}); }
   catch (e) { $("homeEvents").innerHTML = "<p class='error'>" + esc(e.message) + "</p>"; return; }
   const evs = (r && r.events) || [];
   if (!evs.length) {
+    $("homeStats").classList.add("hidden");
     $("homeEvents").innerHTML = "<p class='muted'>No events on sale right now — check back soon.</p>";
     return;
   }
+  const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+  const inWeek = evs.filter((e) => { const dd = (new Date(e.event_date + "T00:00:00") - today0) / 864e5; return dd >= 0 && dd <= 7; }).length;
+  const soldTotal = evs.reduce((s, e) => s + (Number(e.sold) || 0), 0);
+  const dot = (bg, svg) => `<span class="dot" style="background:${bg}"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${svg}</svg></span>`;
+  $("homeStats").innerHTML =
+    `<div class="seg">${dot("#EA0F9E", '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>')}<span><span class="num">${evs.length}</span><span class="lab">Events on sale</span></span></div>` +
+    `<div class="seg">${dot("#2F80ED", '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')}<span><span class="num">${inWeek}</span><span class="lab">This week</span></span></div>` +
+    `<div class="seg">${dot("#F07D1A", '<path d="M12 3c.8 2.8-2.2 4.6-2.2 7a4.2 4.2 0 0 0 8.4 0c0-1.4-.4-2.4-.9-3.4-1.1 1-1.9 1.6-1.9 1.6.2-2-.9-4-3.4-5.2z"/>')}<span><span class="num">${soldTotal}</span><span class="lab">Tickets sold</span></span></div>`;
+  $("homeStats").classList.remove("hidden");
   $("homeEvents").innerHTML = evs.map((e) => `
-    <div class="event-card ticket-row" data-store="${esc(e.slug)}" role="button" tabindex="0" aria-label="Get tickets for ${esc(e.name)}">
-      <div class="t-top">
-        ${e.flyer_url ? `<img class="t-thumb" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
-        <div class="t-main">
-          <div class="t-date">${esc([fmtDate(e.event_date), e.start_time].filter(Boolean).join(" • "))}</div>
-          <div class="t-name">${esc(e.name)}</div>
-          <div class="t-by">by ${esc(e.business_name)}</div>
-        </div>
-        <span class="t-arrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
-      </div>
-      <div class="perf"></div>
-      <div class="t-strip">
-        <span class="t-venue"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><span>${esc(e.venue || "")}</span></span>
-        ${e.from_price != null ? `<span class="t-price">from ${money(e.from_price)}</span>` : ""}
+    <div class="pick-card" data-store="${esc(e.slug)}" data-search="${esc((e.name + " " + e.business_name + " " + (e.venue || "")).toLowerCase())}" role="button" tabindex="0" aria-label="Get tickets for ${esc(e.name)}">
+      <div class="pick-media">${e.flyer_url ? `<img class="pick-ambient" src="${esc(e.flyer_url)}" alt="" aria-hidden="true"><img class="pick-flyer" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : `<div class="pick-noimg">${esc((e.name || "?").trim().charAt(0).toUpperCase())}</div>`}</div>
+      <div class="pick-body">
+        <div class="pick-by">${esc(e.business_name)}</div>
+        <div class="pick-title">${esc(e.name)}</div>
+        <div class="pick-meta">${esc([fmtDate(e.event_date), e.start_time].filter(Boolean).join(" • "))}</div>
+        <div class="pick-meta"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><span>${esc(e.venue || "Venue TBA")}${e.sold ? " · " + e.sold + " going" : ""}</span></div>
+        <button type="button" class="pick-cta" tabindex="-1">Get Tickets${e.from_price != null ? " · from " + money(e.from_price) : ""}</button>
       </div>
     </div>`).join("");
   $("homeEvents").querySelectorAll("[data-store]").forEach((b) =>
     b.addEventListener("click", () => goStore(b.dataset.store)));
-  $("homeEvents").querySelectorAll(".ticket-row").forEach((card, i) => tintCard(card, evs[i].flyer_url));
+  const si = $("homeSearch");
+  if (si) { si.value = ""; si.oninput = () => { const q = si.value.trim().toLowerCase(); $("homeEvents").querySelectorAll(".pick-card").forEach((c) => { c.style.display = !q || (c.dataset.search || "").includes(q) ? "" : "none"; }); }; }
 }
 
 async function submitSignup(ev) {
@@ -1314,26 +1320,20 @@ async function openShop() {
   $("shopBiz").textContent = shopData.business_name;
   const evs = shopData.events || [];
   $("shopEvents").innerHTML = evs.length ? evs.map((e) => `
-    <div class="event-card ticket-row" data-shop-ev="${e.id}" role="button" tabindex="0" aria-label="Order tickets for ${esc(e.name)}">
-      <div class="t-top">
-        ${e.flyer_url ? `<img class="t-thumb" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : ""}
-        <div class="t-main">
-          <div class="t-date">${esc([fmtDate(e.event_date), e.start_time].filter(Boolean).join(" • "))}</div>
-          <div class="t-name">${esc(e.name)}</div>
-          <div class="t-by">${(e.types || []).filter((t) => !t.is_addon).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}</div>
-        </div>
-        <span class="t-arrow"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
-      </div>
-      <div class="perf"></div>
-      <div class="t-strip">
-        <span class="t-venue"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><span>${esc(e.venue || "")}</span></span>
-        <span class="t-price">Order tickets</span>
+    <div class="pick-card" data-shop-ev="${e.id}" role="button" tabindex="0" aria-label="Order tickets for ${esc(e.name)}">
+      <div class="pick-media">${e.flyer_url ? `<img class="pick-ambient" src="${esc(e.flyer_url)}" alt="" aria-hidden="true"><img class="pick-flyer" src="${esc(e.flyer_url)}" alt="${esc(e.name)} flyer">` : `<div class="pick-noimg">${esc((e.name || "?").trim().charAt(0).toUpperCase())}</div>`}</div>
+      <div class="pick-body">
+        <div class="pick-by">${(e.types || []).filter((t) => !t.is_addon).map((t) => esc(t.name) + " " + money(t.price)).join(" • ")}</div>
+        <div class="pick-title">${esc(e.name)}</div>
+        <div class="pick-meta">${esc([fmtDate(e.event_date), e.start_time].filter(Boolean).join(" • "))}</div>
+        <div class="pick-meta"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-5.6-7-11a7 7 0 1 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><span>${esc(e.venue || "Venue TBA")}${e.sold ? " · " + e.sold + " going" : ""}</span></div>
+        <button type="button" class="pick-cta" tabindex="-1">Order Tickets</button>
       </div>
     </div>`).join("")
     : "<p class=\"muted\">No events are on sale right now.</p>";
   $("shopEvents").querySelectorAll("[data-shop-ev]").forEach((b) =>
     b.addEventListener("click", () => selectShopEvent(b.getAttribute("data-shop-ev"))));
-  $("shopEvents").querySelectorAll(".ticket-row").forEach((card, i) => tintCard(card, evs[i].flyer_url));
+  $("shopEvents").querySelectorAll(".pick-card").forEach((card, i) => tintCard(card, evs[i].flyer_url));
 }
 
 /* Checkout: pick quantities across ticket types and add-ons, answer the
